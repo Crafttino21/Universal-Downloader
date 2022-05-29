@@ -21,10 +21,8 @@ How to install:
     Press
      the Big Code Button 
      ![image](https://user-images.githubusercontent.com/58913870/170872727-ef34e6c8-85db-411c-b51e-90533a78b9f2.png)
-     
-     And Press "Download as Zip":
+      And Press "Download as Zip:"
      ![image](https://user-images.githubusercontent.com/58913870/170872793-c5a81dec-d813-488c-8a59-2e0b6448e583.png)
-      
       Now Unzip the .zip with WinRAR or 7zip on your Deskrop!!
       
 If you Have it:
