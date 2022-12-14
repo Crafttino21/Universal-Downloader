@@ -3,17 +3,28 @@ import os
 import time
 from colorama import Fore
 import requests
+import youtube_dl
+import ctypes
+
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
+#Mbox('Your title', 'Your text', 1)
+
 
 txt = "Open SOrce YouTube Converter by CraftModzZ"
 x = txt.title()
+
+Mbox('MultiDownloader', 'OS MultiDownloader by WeepingAngel | Version: 1.2', 1)
 
 def menu():
     print(x)
     print(Fore.RED + banner)
 
-    print("[1] YouTube to mp4 Downloader")
+    print("[1] YouTube to MP4")
     print()
     print("[2] Image Downloader")
+    print()
+    print("[3] YouTube to MP3 (New!)")
     print()
 
 
@@ -22,20 +33,15 @@ def menu():
 
 banner = '''
 
-
- ███▄ ▄███▓ █    ██  ██▓  ▄▄▄█████▓ ██▓   ▓█████▄  ▒█████   █     █░███▄    █  ██▓     ▒█████   ▄▄▄      ▓█████▄ ▓█████  ██▀███  
-▓██▒▀█▀ ██▒ ██  ▓██▒▓██▒  ▓  ██▒ ▓▒▓██▒   ▒██▀ ██▌▒██▒  ██▒▓█░ █ ░█░██ ▀█   █ ▓██▒    ▒██▒  ██▒▒████▄    ▒██▀ ██▌▓█   ▀ ▓██ ▒ ██▒
-▓██    ▓██░▓██  ▒██░▒██░  ▒ ▓██░ ▒░▒██▒   ░██   █▌▒██░  ██▒▒█░ █ ░█▓██  ▀█ ██▒▒██░    ▒██░  ██▒▒██  ▀█▄  ░██   █▌▒███   ▓██ ░▄█ ▒
-▒██    ▒██ ▓▓█  ░██░▒██░  ░ ▓██▓ ░ ░██░   ░▓█▄   ▌▒██   ██░░█░ █ ░█▓██▒  ▐▌██▒▒██░    ▒██   ██░░██▄▄▄▄██ ░▓█▄   ▌▒▓█  ▄ ▒██▀▀█▄  
-▒██▒   ░██▒▒▒█████▓ ░██████▒▒██▒ ░ ░██░   ░▒████▓ ░ ████▓▒░░░██▒██▓▒██░   ▓██░░██████▒░ ████▓▒░ ▓█   ▓██▒░▒████▓ ░▒████▒░██▓ ▒██▒
-░ ▒░   ░  ░░▒▓▒ ▒ ▒ ░ ▒░▓  ░▒ ░░   ░▓      ▒▒▓  ▒ ░ ▒░▒░▒░ ░ ▓░▒ ▒ ░ ▒░   ▒ ▒ ░ ▒░▓  ░░ ▒░▒░▒░  ▒▒   ▓▒█░ ▒▒▓  ▒ ░░ ▒░ ░░ ▒▓ ░▒▓░
-░  ░      ░░░▒░ ░ ░ ░ ░ ▒  ░  ░     ▒ ░    ░ ▒  ▒   ░ ▒ ▒░   ▒ ░ ░ ░ ░░   ░ ▒░░ ░ ▒  ░  ░ ▒ ▒░   ▒   ▒▒ ░ ░ ▒  ▒  ░ ░  ░  ░▒ ░ ▒░
-░      ░    ░░░ ░ ░   ░ ░   ░       ▒ ░    ░ ░  ░ ░ ░ ░ ▒    ░   ░    ░   ░ ░   ░ ░   ░ ░ ░ ▒    ░   ▒    ░ ░  ░    ░     ░░   ░ 
-       ░      ░         ░  ░        ░        ░        ░ ░      ░            ░     ░  ░    ░ ░        ░  ░   ░       ░  ░   ░     
-                                           ░                                                              ░                      
-                                                            
-                                * Open Sorce YouTube Converter by CraftModzZ *
-                        Discord: _WeepingAngel_ VI#6666 | GitHub: https://www.github.com/crafttino21
+███╗   ███╗██╗   ██╗██╗  ████████╗██╗██████╗  ██████╗ ██╗    ██╗███╗   ██╗██╗      ██████╗  █████╗ ██████╗ 
+████╗ ████║██║   ██║██║  ╚══██╔══╝██║██╔══██╗██╔═══██╗██║    ██║████╗  ██║██║     ██╔═══██╗██╔══██╗██╔══██╗
+██╔████╔██║██║   ██║██║     ██║   ██║██║  ██║██║   ██║██║ █╗ ██║██╔██╗ ██║██║     ██║   ██║███████║██║  ██║
+██║╚██╔╝██║██║   ██║██║     ██║   ██║██║  ██║██║   ██║██║███╗██║██║╚██╗██║██║     ██║   ██║██╔══██║██║  ██║
+██║ ╚═╝ ██║╚██████╔╝███████╗██║   ██║██████╔╝╚██████╔╝╚███╔███╔╝██║ ╚████║███████╗╚██████╔╝██║  ██║██████╔╝
+╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝╚═════╝  ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝ 
+                                                                                                           
+                        * Open Sorce Multi Downloader by CraftModzZ *
+                Discord: _WeepingAngel_ VI#6666 | GitHub: https://www.github.com/crafttino21
 
 
 '''
@@ -55,6 +61,7 @@ while option != 0:
             print(Fore.BLUE + "Uploader: " + z)
             ys = yt.streams.get_highest_resolution()
             ys.download()
+            Mbox('MultiDownloader', 'Download Complete!', 1)
             print(Fore.GREEN + "Download Complete!!")
             time.sleep(5)
             exit()
@@ -70,9 +77,24 @@ while option != 0:
             print(r.content)
             with open("output.png", "wb") as f:
                 f.write(r.content)
+                Mbox('MultiDownloader', 'Download Complete!', 1)
                 print(Fore.GREEN + "Download Complete!!") 
         except:
             print(Fore.RED + "[ERROR] Cant COnvert!!")
+    if option == 3:
+        print("YouTube to MP3 (Beta)")
+        yt = YouTube(
+            str(input("Enter the URL of the video you want to download: \n>> ")))
+        video = yt.streams.filter(only_audio=True).first()
+        print("Enter the destination (leave blank for current directory)")
+        destination = str(input(">> ")) or '.'
+        out_file = video.download(output_path=destination)
+        base, ext = os.path.splitext(out_file)
+        new_file = base + '.mp3'
+        os.rename(out_file, new_file)
+        print(yt.title + " has been successfully downloaded.")
+        Mbox('MultiDownloader', 'Download Succssessfully!', 1)  
+        exit()
     else:
             print(Fore.RED + "Invalid formart!")
 
