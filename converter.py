@@ -1,3 +1,5 @@
+# Your syntax is very blocky so I cleaned it up a little bit
+
 import ctypes
 import os
 import time
