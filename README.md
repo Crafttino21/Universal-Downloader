@@ -1,19 +1,19 @@
 # Universal-Downloader
-a Python based Converter for some stuff. I wanna add some new functions later. Actual it can download pictures from Google and YouTube Videos :)
+a Python based Converter for some stuff. I wanna add some new functions later. Actual it can download pictures from Google and YouTube Videos
 Everything is Ad-Free, I dont like Paid or Ad-Infected Stuff
 
 Version 1.2:
   Functions:
   - Download YouTube Videos as MP4
-  - Download Pictures from any Site and google with the Picture sorce
+  - Download Pictures from any Site and google with the picture source
   - Download YouTube MP3 
 
 How to install:
   I wanna add an Installer.
-  You Need to have installed Python!! (I have tested it on Python 3.9 For Windows and 2.7 For Windows)
+  You need to have installed Python!! (I have tested it on Python 3.9 For Windows and 2.7 For Windows)
   
   Before Start:
-  Download the GitHub Resp.
+  Download the GitHub Repo.
   Linux:
     sudo apt update
     sudo install git <== Skip this if you have it already :)
@@ -30,4 +30,5 @@ If all is done:
   
   Have Fun :)
   
-THIS TOOL IS FOR PRIVAT USE ONLY!!!! DONT USE IT FOR BREAK COPYRIGHT LAWS OR ANYTHING!!!!!
+  
+THIS TOOL IS FOR PRIVATE USE ONLY!!!! DON'T USE IT TOO BREAK COPYRIGHT LAWS OR FEDERAL LAWS!
