@@ -2,6 +2,10 @@
 A Python-based Converter for some stuff. I wanna add some new functions later. Actual it can download pictures from Google and YouTube Videos
 Everything is Ad-Free, I dont like Paid or Ad-Infected Stuff
 
+
+Edit to 1.2.1 (Patched) Version:
+- I patched a critical bug that crashs the program while downloading
+
 Version 1.2:
  Functions:
  - Download YouTube Videos as MP4
