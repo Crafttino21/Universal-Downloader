@@ -5,7 +5,6 @@ import os
 import time
 
 import requests
-from colorama import Fore
 from pytube import YouTube
 
 
@@ -16,18 +15,21 @@ def Mbox(title, text, style):
 # Mbox('Your title', 'Your text', 1)
 
 
-txt = "Open SOrce YouTube Converter by CraftModzZ"
-x = txt.title()
-# Clears the console
-CC = lambda: os.system('cls' if os.name in ('nt', 'dos') else 'clear')
 
-Mbox('MultiDownloader', 'OS MultiDownloader by WeepingAngel | Version: 1.2', 1)
+# Clears the console
+
+
+Mbox('MultiDownloader', 'OS MultiDownloader by WeepingAngel | Version: 1.2.1 (Patched)', 1)
+
+blue = os.system("color b")
+red = os.system("color C")
+green = os.system("color a")
+pink = os.system("color D")
 
 
 def menu():
-	print(x)
-	print(Fore.RED + banner)
-
+	print(banner)
+	os.system("color D")
 	print("[1] YouTube to MP4")
 	print()
 	print("[2] Image Downloader")
@@ -45,7 +47,7 @@ banner = '''
 ██║ ╚═╝ ██║╚██████╔╝███████╗██║   ██║██████╔╝╚██████╔╝╚███╔███╔╝██║ ╚████║███████╗╚██████╔╝██║  ██║██████╔╝
 ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝╚═════╝  ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝ 
 
-                        * Open Sorce Multi Downloader by CraftModzZ *
+                        * Open Sorce Multi Downloader by CraftModzZ aka. WeepingAngel *
                 Discord: _WeepingAngel_ VI#6666 | GitHub: https://www.github.com/crafttino21
 
 
@@ -56,27 +58,29 @@ option = int(input("Choose your Converter > "))
 while option != 0:
 	if option == 1:
 		try:
-			CC()
-			link = input("Enter YouTube Link (mp4): ")
+			link = input("Enter your YouTube Link (mp4): ")
 			yt = YouTube(link)
-
 			y = yt.title.title()
-			print(Fore.BLUE + "Video Title: " + y)
+			print("Video Title: " + y)
 			z = yt.author.title()
-			print(Fore.BLUE + "Uploader: " + z)
+			print("Uploader: " + z)
 			ys = yt.streams.get_highest_resolution()
 			ys.download()
-			Mbox('MultiDownloader', 'Download Complete!', 1)
-			print(Fore.GREEN + "Download Complete!!")
-			time.sleep(5)
-			exit()
+			Mbox('MultiDownloader by WeepingAngel', 'Download Sussccessfully and Finished!', 1)
+			et = input("Do you wanna Download another video? (Y/N) > ")
+			if et == "Y":
+				os.system("cls")
+				menu()
+				option = int(input("Choose your Converter > "))
+			else:
+				Mbox('MultiDownloader by WeepingAngel', 'Thanks for Using This Tool :)', 1)
+				exit()
 		except:
-			print(Fore.RED + "[ERROR] Cant Download the Video or invalid link!")
+			print("[ERROR] Cant Download the Video or invalid link!")
 			time.sleep(5)
 			exit()
 	elif option == 2:
 		try:
-			CC()
 			web = input("Paste your Image: ")
 			r = requests.get(web)
 
@@ -84,11 +88,10 @@ while option != 0:
 			with open("output.png", "wb") as f:
 				f.write(r.content)
 				Mbox('MultiDownloader', 'Download Complete!', 1)
-				print(Fore.GREEN + "Download Complete!!")
+				print(green + "Download Complete!!")
 		except:
-			print(Fore.RED + "[ERROR] Cant Convert!!")
+			print("[ERROR] Cant Convert!!")
 	if option == 3:
-		CC()
 		print("YouTube to MP3 (Beta)")
 		yt = YouTube(
 			str(input("Enter the URL of the video you want to download: \n>> ")))
@@ -103,7 +106,7 @@ while option != 0:
 		Mbox('MultiDownloader', 'Download Successfully!', 1)
 		exit()
 	else:
-		print(Fore.RED + "Invalid format!")
+		print("Invalid format!")
 
 	print()
 	menu()
