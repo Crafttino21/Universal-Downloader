@@ -1,6 +1,6 @@
 # Universal-Downloader
-A Python-based Converter for some stuff. I wanna add some new functions later. Actual it can download pictures from Google and YouTube Videos
-Everything is Ad-Free, I dont like Paid or Ad-Infected Stuff
+A Python-based converter for some stuff, I wanna add some new functions later. The program can download pictures from Google and YouTube Videos
+Everything is Ad-Free, I dont like paid or Ad-Infected stuff.
 
 
 Edit to 1.2.1 (Patched) Version:
@@ -8,8 +8,8 @@ Edit to 1.2.1 (Patched) Version:
 
 Version 1.2:
  Functions:
- - Download YouTube Videos as MP4
- - Download Pictures from any Site and google with the picture source
+ - Download YouTube videos as MP4
+ - Download pictures from any site and Google with the picture source
  - Download YouTube MP3
 
 How to install:
@@ -20,14 +20,14 @@ How to install:
  Download the GitHub Repo.
  Linux:
    sudo apt update
-   sudo install git <== Skip this if you have it already :)
+   sudo apt-get install git <== Skip this if you have it already :)
    git clone https://github.com/Crafttino21/Universal-Downloader.git
    
   Windows:
-   Download the Official version here: https://github.com/Crafttino21/Universal-Downloader/releases/tag/1.2
+   Download the official version here: https://github.com/Crafttino21/Universal-Downloader/releases/tag/1.2
      
 If you Have it:
- Open a console on the Directory and Type "pip install -r requrimants.txt"
+ Open a console on the directory and type "pip install -r requrimants.txt"
  
 If all is done:
  Type "python converter.py"
