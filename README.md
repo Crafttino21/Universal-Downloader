@@ -18,7 +18,6 @@ A Python-based converter for some stuff, I wanna add some new functions later. T
 
 
 ## How to install
-
 **Prerequisites**  
 * [Python](https://www.python.org/downloads) 3.9/3.10/3.11
 * Windows 10+
