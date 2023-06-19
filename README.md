@@ -1,6 +1,12 @@
 # Universal-Downloader
 A Python-based converter for some stuff, I wanna add some new functions later. The program can download pictures from Google and YouTube Videos Everything is Ad-Free, I dont like paid or Ad-Infected stuff.
 
+**New to version 1.3**
+* Mayor Bug fixes
+* Crash-on-Download Fix
+* fix for a shitty error message by the requests libary which is Enoing but have no Consequents for the code
+P.S look Below for the feature of MultiDownloader!!
+
 
 **New to version 1.2.2 (Patched)**
 * Used while True instead of while option != 0 to simplify the loop.
@@ -16,6 +22,13 @@ A Python-based converter for some stuff, I wanna add some new functions later. T
  - Download pictures from any site and Google with the picture source
  - Download YouTube MP3
 
+**Planed feature for MultiDownloader**
+* Add a Torrent function
+* add Tiktok Options
+* add Reddit options
+* add Spotify options
+* give evrything a GUi outside of the Command line (Maybe)
+  Spaical thank's to Cozi to help me Fixing bugs and make the code cleaner :)
 
 ## How to install
 **Prerequisites**  
