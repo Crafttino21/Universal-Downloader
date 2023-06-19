@@ -23,11 +23,13 @@ banner = '''
 ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝╚═════╝  ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝ 
 
                         * Open Sorce Multi Downloader by CraftModzZ aka. WeepingAngel *
-                Discord: _WeepingAngel_ VI#6666 | GitHub: https://www.github.com/crafttino21
-
+                Discord: _WeepingAngel_ VI#6666 | GitHub: https://www.github.com/Crafttino21
+               * Thanks to Cozi to make Afterpatches and help me to clean my code *
+                            # GitHub: https://github.com/itzCozi #
+                                     Version: 1.3 
 
 '''
-
+# P.S Cozi feel free to intigrate your own extensions if you want :)
 
 class colors:
   '''
@@ -149,8 +151,9 @@ class functions:
 # This is the first block of code ran
 try:
   functions.Mbox('MultiDownloader',
-       'OS MultiDownloader by WeepingAngel | Version: 1.2.1 (Patched)', 1)
+       'MultiDownloader by WeepingAngel | Version: 1.3', 1)
   functions.menu()
+  os.system("cls") # i dont now how to intigrate your clr so feel free to put it in here Cozi :)
 except Exception as e:
   # If we cannot do the above block print the error and exit with error code `1`
   print(f"An unkown runtime error occured \n{e}\n")
