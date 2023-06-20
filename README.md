@@ -1,6 +1,9 @@
 # Universal-Downloader
 A Python-based converter for some stuff, I wanna add some new functions later. The program can download pictures from Google and YouTube Videos Everything is Ad-Free, I dont like paid or Ad-Infected stuff.
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X7MF230)
+
+
 **New to version 1.3**
 * Mayor Bug fixes
 * Crash-on-Download Fix
