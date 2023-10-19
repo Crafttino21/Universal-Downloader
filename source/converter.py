@@ -26,7 +26,7 @@ banner = '''
                 Discord: _WeepingAngel_ VI#6666 | GitHub: https://www.github.com/Crafttino21
                * Thanks to Cozi to make Afterpatches and help me to clean my code *
                             # GitHub: https://github.com/itzCozi #
-                                     Version: 1.3 
+                                      Version: 1.3 
 
 '''
 # P.S Cozi feel free to intigrate your own extensions if you want :)
