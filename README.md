@@ -3,6 +3,8 @@ A Python-based converter for some stuff, I wanna add some new functions later. T
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X7MF230)
 
+MD5 of exe: C2FA4B9C472C3521DF80D64958AFA0FD
+
 
 **New to version 1.3**
 * Mayor Bug fixes
