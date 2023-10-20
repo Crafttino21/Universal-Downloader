@@ -46,7 +46,7 @@ P.S look Below for the feature of MultiDownloader!!
 `git clone https://github.com/Crafttino21/Universal-Downloader.git`  
    
 ### Windows
-Download the official version [here](https://github.com/Crafttino21/Universal-Downloader/releases/tag/1.2)  
+Download the official version [here](https://github.com/Crafttino21/Universal-Downloader/releases)  
 Or download and extract the `.zip` of main brach [here](https://github.com/Crafttino21/Universal-Downloader/archive/refs/heads/main.zip)  
      
 **Once Installed**  
