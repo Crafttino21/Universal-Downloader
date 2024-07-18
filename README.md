@@ -3,7 +3,12 @@ A Python-based converter for some stuff, I wanna add some new functions later. T
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X7MF230)
 
-MD5 of exe: C2FA4B9C472C3521DF80D64958AFA0FD
+MD5 of exe: C2FA4B9C472C3521DF80D64958AFA0FD (Not Updated Yet!)
+
+**New to version 1.3.1 (Patch)**
+* Added 2 new YouTube functions to replace PyTube in 1.4 
+
+
 
 
 **New to version 1.3**
