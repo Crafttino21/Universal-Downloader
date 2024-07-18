@@ -12,6 +12,9 @@ import os, sys
 import time
 import requests
 from pytube import YouTube
+import yt_dlp
+
+
 
 banner = '''
 
@@ -26,7 +29,7 @@ banner = '''
                 Discord: _WeepingAngel_ VI#6666 | GitHub: https://www.github.com/Crafttino21
                * Thanks to Cozi to make Afterpatches and help me to clean my code *
                             # GitHub: https://github.com/itzCozi #
-                                      Version: 1.3 
+                                      Version: 1.3.1 (Patch) 
 
 '''
 # P.S Cozi feel free to intigrate your own extensions if you want :)
@@ -40,6 +43,53 @@ class colors:
   red = os.system("color C")
   green = os.system("color a")
   pink = os.system("color D")
+
+
+class YoutubeBeta(): # a new method for testing to replace pyTube, Its just a small fix
+  def download_video(url, output_path):
+    # Überprüfen und Ordner erstellen, falls nicht existent
+    if not os.path.exists(os.path.dirname(output_path)):
+      try:
+        os.makedirs(os.path.dirname(output_path))
+      except OSError as exc:
+        if exc.errno != os.errno.EEXIST:
+          raise
+
+    ydl_opts = {
+      'format': 'bestvideo+bestaudio/best',
+      'outtmpl': output_path,
+      'noplaylist': True,
+      'continuedl': True,
+      'nocheckcertificate': True,
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+
+  def download_audio(url, output_path):
+    # Überprüfen und Ordner erstellen, falls nicht existent
+    if not os.path.exists(os.path.dirname(output_path)):
+      try:
+        os.makedirs(os.path.dirname(output_path))
+      except OSError as exc:
+        if exc.errno != os.errno.EEXIST:
+          raise
+
+    ydl_opts = {
+      'format': 'bestaudio/best',
+      'outtmpl': output_path,
+      'noplaylist': True,
+      'continuedl': True,
+      'nocheckcertificate': True,
+      'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+        'preferredquality': '192',
+      }],
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+      ydl.download([url])
 
 
 class functions:
@@ -75,7 +125,9 @@ class functions:
     # Use '\n' to create a new line
     print("[1] YouTube to MP4 \n")
     print("[2] Image Downloader \n")
-    print("[3] YouTube to MP3 (New!) \n\n")
+    print("[3] YouTube to MP3 (New!) \n")
+    print("[4] YouTube to MP4 (TEST) \n")
+    print("[5] YouTube to MP3 (TEST) \n\n")
 
     while True:
       option = input(option_text)
@@ -137,10 +189,29 @@ class functions:
           print("[ERROR] Can't Download the Audio or Invalid URL!")
           time.sleep(5)
           continue
+      elif option == "4":
+        print("YouTube to MP3 (DEMO)")
+        url = input("Enter your YouTube URL > ")
+        output_path = input("Enter the path to download > ")
+        # Sicherstellen, dass der Pfad auf eine Datei zeigt, nicht nur auf einen Ordner
+        if os.path.isdir(output_path):
+          output_path = os.path.join(output_path, 'video.mp4')
+        YoutubeBeta.download_video(url, output_path)
+        functions.Mbox('MultiDownloader', 'Download Successfully!', 1)
+
+      elif option == "5":
+        print("YouTube to MP3 (DEMO)")
+        url = input("Enter your YouTube URL > ")
+        output_path = input("Enter the path to download > ")
+        # Sicherstellen, dass der Pfad auf eine Datei zeigt, nicht nur auf einen Ordner
+        if os.path.isdir(output_path):
+          output_path = os.path.join(output_path, 'audio.mp3')
+        YoutubeBeta.download_audio(url, output_path)
+        functions.Mbox('MultiDownloader', 'Download Successfully!', 1)
 
       elif option == "0":
         functions.Mbox('MultiDownloader by WeepingAngel',
-             'Thanks for Using This Tool :)', 1)
+             'Thanks for Using This Tool :)', 64)
         sys.exit(0)
 
       else:
@@ -151,7 +222,7 @@ class functions:
 # This is the first block of code ran
 try:
   functions.Mbox('MultiDownloader',
-       'MultiDownloader by WeepingAngel | Version: 1.3', 1)
+       'MultiDownloader by WeepingAngel | Version: 1.3.1 (Patch)', 64)
   functions.menu()
   os.system("cls") # i dont now how to intigrate your clr so feel free to put it in here Cozi :)
 except Exception as e:
