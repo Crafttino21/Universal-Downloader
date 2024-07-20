@@ -7,7 +7,7 @@ MD5 of exe: C2FA4B9C472C3521DF80D64958AFA0FD (Not Updated Yet!)
 
 **1.4 exe reupload**
 * Security Patch: Removed youtube-dl libary out of the compiler progress
-  WARNING! Version 1.3.1 may still be vulnerable to this vulnerability!
+* WARNING! Version 1.3.1 may still be vulnerable to this vulnerability!
 
 **New to version 1.4**
 * added --install-ffmpeg argument and installer (requires winget)
