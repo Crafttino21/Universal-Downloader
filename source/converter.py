@@ -13,6 +13,9 @@ import time
 import requests
 from pytube import YouTube
 import yt_dlp
+import argparse
+import shutil
+import subprocess
 
 
 
@@ -29,7 +32,7 @@ banner = '''
                 Discord: _WeepingAngel_ VI#6666 | GitHub: https://www.github.com/Crafttino21
                * Thanks to Cozi to make Afterpatches and help me to clean my code *
                             # GitHub: https://github.com/itzCozi #
-                                      Version: 1.3.1 (Patch) 
+                                      Version: 1.4 (Patch) 
 
 '''
 # P.S Cozi feel free to intigrate your own extensions if you want :)
@@ -44,6 +47,36 @@ class colors:
   green = os.system("color a")
   pink = os.system("color D")
 
+class syscalls:
+  def check_ffmpeg_installed():
+    """Prüft, ob ffmpeg installiert ist."""
+    return shutil.which("ffmpeg") is not None
+
+
+  def install_ffmpeg():
+    """Installiert ffmpeg mit winget."""
+    try:
+      os.system("winget install ffmpeg")
+    except subprocess.CalledProcessError as e:
+      print(f"Fehler beim Installieren von ffmpeg: {e}")
+    else:
+      print("ffmpeg erfolgreich installiert.")
+
+  def args():
+    parser = argparse.ArgumentParser(description="Install's ffmpeg to run YT Download.")
+    parser.add_argument("--install-ffmpeg", action="store_true",
+                        help="Install's ffmpeg, if it not installed.")
+
+    args = parser.parse_args()
+
+    if args.install_ffmpeg:
+      if syscalls.check_ffmpeg_installed():
+        print("ffmpeg is already installed.")
+        functions.Mbox("MultiConverter by WeepingAngel", "ffmpeg is already installed!", 64)
+      else:
+        print("ffmpeg is not installed. Starting installation...")
+        syscalls.install_ffmpeg()
+
 
 class YoutubeBeta(): # a new method for testing to replace pyTube, Its just a small fix
   def download_video(url, output_path):
@@ -56,7 +89,7 @@ class YoutubeBeta(): # a new method for testing to replace pyTube, Its just a sm
           raise
 
     ydl_opts = {
-      'format': 'bestvideo+bestaudio/best',
+      'format': 'bestvideo+bestaudio[ext=m4a]/best',
       'outtmpl': output_path,
       'noplaylist': True,
       'continuedl': True,
@@ -76,7 +109,7 @@ class YoutubeBeta(): # a new method for testing to replace pyTube, Its just a sm
           raise
 
     ydl_opts = {
-      'format': 'bestaudio/best',
+      'format': 'bestaudio[ext=m4a]/best',
       'outtmpl': output_path,
       'noplaylist': True,
       'continuedl': True,
@@ -125,30 +158,27 @@ class functions:
     # Use '\n' to create a new line
     print("[1] YouTube to MP4 \n")
     print("[2] Image Downloader \n")
-    print("[3] YouTube to MP3 (New!) \n")
-    print("[4] YouTube to MP4 (TEST) \n")
-    print("[5] YouTube to MP3 (TEST) \n\n")
+    print("[3] YouTube to MP3 (New!) \n\n")
+
 
     while True:
       option = input(option_text)
 
       if option == "1":
         try:
-          link = input("Enter your YouTube Link (mp4): ")
-          yt = YouTube(link)
-          y = yt.title.title()
-          print(f"Video Title: {y}")
-          z = yt.author.title()
-          print(f"Uploader: {z}")
-          ys = yt.streams.get_highest_resolution()
-          ys.download()
-          functions.Mbox('MultiDownloader by WeepingAngel',
-               'Download Successfully and Finished!', 1)
+          print("YouTube to MP4 ")
+          functions.Mbox("MultiDownlaoder by WeepingAngel", "This Tool NEEDS ffmpeg installed! If you dont have it, type '--install-ffmpeg'!", 48)
+          url = input("Enter your YouTube URL > ")
+          output_path = input("Enter the path to download > ")
+          # Sicherstellen, dass der Pfad auf eine Datei zeigt, nicht nur auf einen Ordner
+          if os.path.isdir(output_path):
+            output_path = os.path.join(output_path, 'video.mp4')
+          YoutubeBeta.download_video(url, output_path)
+          functions.Mbox('MultiDownloader', 'Download Successfully!', 1)
         except:
-          print("[ERROR] Can't Download the Video or invalid link!")
+          print("[ERROR] Can't Download the Audio or Invalid URL!")
           time.sleep(5)
           continue
-
         et = input("Do you want to Download another video? (Y/N) > ")
         if et.lower() == "y":
           functions.clearConsole()
@@ -171,43 +201,36 @@ class functions:
           print("[ERROR] Can't Convert!")
           continue
 
+        et = input("Do you want to Download another Image? (Y/N) > ")
+        if et.lower() == "y":
+          functions.clearConsole()
+          continue
+        else:
+          functions.Mbox('MultiDownloader by WeepingAngel',
+                         'Thanks for Using This Tool :)', 1)
+          sys.exit(0)
+
       elif option == "3":
         print("YouTube to MP3 (Beta)")
         try:
-          yt = YouTube(
-            str(input("Enter the URL of the video you want to download: \n>> ")))
-          video = yt.streams.filter(only_audio=True).first()
-          destination = input(
-            "Enter the destination (leave blank for current directory)\n>> ") or '.'
-          out_file = video.download(output_path=destination)
-          base, ext = os.path.splitext(out_file)
-          new_file = f'{base}.mp3'
-          os.rename(out_file, new_file)
-          print(f"{yt.title} has been successfully downloaded.")
+          url = input("Enter your YouTube URL > ")
+          output_path = input("Enter the path to download > ")
+          if os.path.isdir(output_path):
+            output_path = os.path.join(output_path, 'audio.mp3')
+          YoutubeBeta.download_audio(url, output_path)
           functions.Mbox('MultiDownloader', 'Download Successfully!', 1)
         except:
           print("[ERROR] Can't Download the Audio or Invalid URL!")
           time.sleep(5)
           continue
-      elif option == "4":
-        print("YouTube to MP3 (DEMO)")
-        url = input("Enter your YouTube URL > ")
-        output_path = input("Enter the path to download > ")
-        # Sicherstellen, dass der Pfad auf eine Datei zeigt, nicht nur auf einen Ordner
-        if os.path.isdir(output_path):
-          output_path = os.path.join(output_path, 'video.mp4')
-        YoutubeBeta.download_video(url, output_path)
-        functions.Mbox('MultiDownloader', 'Download Successfully!', 1)
-
-      elif option == "5":
-        print("YouTube to MP3 (DEMO)")
-        url = input("Enter your YouTube URL > ")
-        output_path = input("Enter the path to download > ")
-        # Sicherstellen, dass der Pfad auf eine Datei zeigt, nicht nur auf einen Ordner
-        if os.path.isdir(output_path):
-          output_path = os.path.join(output_path, 'audio.mp3')
-        YoutubeBeta.download_audio(url, output_path)
-        functions.Mbox('MultiDownloader', 'Download Successfully!', 1)
+        et = input("Do you want to Download another Audio? (Y/N) > ")
+        if et.lower() == "y":
+          functions.clearConsole()
+          continue
+        else:
+          functions.Mbox('MultiDownloader by WeepingAngel',
+                         'Thanks for Using This Tool :)', 1)
+          sys.exit(0)
 
       elif option == "0":
         functions.Mbox('MultiDownloader by WeepingAngel',
@@ -218,11 +241,13 @@ class functions:
         print("Invalid option!")
         continue
 
-
+if __name__ == "__main__":
+    syscalls.args()
+    time.sleep(3)
 # This is the first block of code ran
 try:
   functions.Mbox('MultiDownloader',
-       'MultiDownloader by WeepingAngel | Version: 1.3.1 (Patch)', 64)
+       'MultiDownloader by WeepingAngel | Version: 1.4 (Patch)', 64)
   functions.menu()
   os.system("cls") # i dont now how to intigrate your clr so feel free to put it in here Cozi :)
 except Exception as e:
