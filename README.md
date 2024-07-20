@@ -5,6 +5,12 @@ A Python-based converter for some stuff, I wanna add some new functions later. T
 
 MD5 of exe: C2FA4B9C472C3521DF80D64958AFA0FD (Not Updated Yet!)
 
+**New to version 1.4**
+* added --install-ffmpeg argument and installer (requires winget)
+* replaces pyTube with yt_dlp
+* Removed test Features
+
+
 **New to version 1.3.1 (Patch)**
 * Added 2 new YouTube functions to replace PyTube in 1.4 
 
@@ -14,7 +20,6 @@ Make sure you installed "Windows Packet Manager" (winget)
 Open a CMD window and type:  
 `converter.exe --install-ffmpeg`  
 if everything is working correct, now everthing works :)  
-
 
 
 **New to version 1.3**
