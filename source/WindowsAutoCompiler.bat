@@ -2,7 +2,7 @@
 title WindowsAutoCompiler by WeepingAngel
 color D
 echo _- WindowsAutoCompiler by WeepingAngel -_
-echo Script: MultiDownloader.py
+echo Script: converter.py
 echo Autor: WeepingAngel
 echo Source: GitHub
 echo Press enter To Start Compiling!
@@ -13,7 +13,7 @@ pip install -r requirements.txt
 echo Check FInished! if you get any errors download Python and PIP!
 pause
 cls
-echo Script: MultiDownloader.py
+echo Script: converter.py
 echo Autor: WeepingAngel
 echo Source: GitHub
 echo ***************************

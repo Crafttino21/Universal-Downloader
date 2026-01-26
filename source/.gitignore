@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+.env/
+
+# Packaging / build
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+
+# PyInstaller
+*.spec.bak
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+Desktop.ini
+
+# App artifacts / downloads (keep repo clean)
+tools/ffmpeg/
+*.mp4
+*.mp3
+*.m4a
+*.webm
+*.mkv
+output.png
