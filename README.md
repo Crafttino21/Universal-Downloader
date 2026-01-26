@@ -1,77 +1,67 @@
-# Universal-Downloader
-A Python-based converter for some stuff, I wanna add some new functions later. The program can download pictures from Google and YouTube Videos Everything is Ad-Free, I dont like paid or Ad-Infected stuff.
+# Universal-Downloader (MultiDownloader) – v1.5
+
+Universal-Downloader is a small Python-based Windows CLI tool that downloads videos/audio via `yt-dlp` and can also download images from a direct image URL.
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X7MF230)
 
-MD5 of exe: C2FA4B9C472C3521DF80D64958AFA0FD (Not Updated Yet!)
+## Supported sites (via `yt-dlp`)
+- YouTube (including Shorts)
+- TikTok
+- Instagram Reels *(often only reliable with login/cookies)*
 
-**1.4 exe reupload**
-* Security Patch: Removed youtube-dl libary out of the compiler progress
-* WARNING! Version 1.3.1 may still be vulnerable to this vulnerability!
+Note: Platforms change frequently. If something stops working, update `yt-dlp` first.
 
-**New to version 1.4**
-* added --install-ffmpeg argument and installer (requires winget)
-* replaces pyTube with yt_dlp
-* Removed test Features
+## Features
+- Batch download: paste multiple URLs (one per line)
+- Video → **MP4** (best quality; merges video+audio when FFmpeg is available)
+- Audio → **MP3** (requires **FFmpeg**)
+- Optional: **FFmpeg installer** (`--install-ffmpeg` or menu `[9]`, works even without `winget`)
+- Optional: **cookies.txt** support for login-only/age-gated content
+- Image downloader: saves a direct image URL to `output.png`
 
+## Quick start (Windows)
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe converter.py
+```
 
-**New to version 1.3.1 (Patch)**
-* Added 2 new YouTube functions to replace PyTube in 1.4 
+## FFmpeg
+FFmpeg is required for:
+- MP3 conversion
+- Merging best-quality video+audio into a single MP4
 
-# Read before use!
-The YouTube to mp4 feature requires ffmpeg!  
-Make sure you installed "Windows Packet Manager" (winget)  
-Open a CMD window and type:  
-`converter.exe --install-ffmpeg`  
-if everything is working correct, now everthing works :)  
+Install via:
+```powershell
+.\.venv\Scripts\python.exe converter.py --install-ffmpeg
+```
+If `winget` is missing/doesn’t work, a portable FFmpeg build is downloaded to `tools/ffmpeg/bin`.
 
+## Batch mode usage (recommended)
+- Pick a menu entry (YouTube/TikTok/Instagram Reels → MP4 or MP3)
+- Choose the output folder once (it’s remembered)
+- Paste URLs **one per line**
+- Empty line starts the batch
+- Type `b` to go back to the menu
 
-**New to version 1.3**
-* Mayor Bug fixes
-* Crash-on-Download Fix
-* fix for a shitty error message by the requests libary which is Enoing but have no Consequents for the code
-P.S look Below for the feature of MultiDownloader!!
+## cookies.txt (Instagram/TikTok)
+Instagram Reels (and sometimes TikTok) often require cookies to work reliably.
+Export your browser cookies as **Netscape cookies.txt** and enter the path when the tool asks for it.
 
+## Build (Windows EXE)
+Use `WindowsAutoCompiler.bat` (PyInstaller) or run:
+```powershell
+pyinstaller converter.py --onefile --clean
+```
 
-**New to version 1.2.2 (Patched)**
-* Used while True instead of while option != 0 to simplify the loop.
-* Used input() instead of int(input()) to handle non-integer input gracefully.
-* Used option.lower() to convert the input option to lowercase and simplify the if statements.
-* Removed the exit() calls in the try-except blocks and used continue instead to keep the loop running.
-* Added better exit() mechanic with sys.exit() which passing a 1 means an error occured.
-* Added a prompt for the destination directory in option 3.
-* Moved the menu() call outside the function to prevent an infinite recursion loop.
+## Update 1.5 (Changelog)
+- New batch UX (download multiple URLs in a row, remembers output folders)
+- Menu split by platform: **YouTube / TikTok / Instagram Reels** (MP4 & MP3)
+- FFmpeg installer now works without `winget` (portable install to `tools/ffmpeg/bin`)
+- Best-quality MP4 selection (MP4 video + M4A audio, merge to MP4 when FFmpeg is available)
+- YouTube Shorts URL normalization
+- Optional cookies.txt support (especially for Reels/logins)
+- Cleaner UI (fewer popups, more batch summary in console)
 
-**Version 1.2 Functions**
- - Download YouTube videos as MP4
- - Download pictures from any site and Google with the picture source
- - Download YouTube MP3
-
-**Planed feature for MultiDownloader**
-* Add a Torrent function
-* add Tiktok Options
-* add Reddit options
-* add Spotify options
-* give evrything a GUi outside of the Command line (Maybe)
-  Spaical thank's to Cozi to help me Fixing bugs and make the code cleaner :)
-
-## How to install
-**Prerequisites**  
-* [Python](https://www.python.org/downloads) 3.9/3.10/3.11
-* Windows 10+
- 
-### Linux:
-`sudo apt update`  
-`sudo apt-get install git` <== Skip this if you have it already  
-`git clone https://github.com/Crafttino21/Universal-Downloader.git`  
-   
-### Windows
-Download the official version [here](https://github.com/Crafttino21/Universal-Downloader/releases)  
-Or download and extract the `.zip` of main brach [here](https://github.com/Crafttino21/Universal-Downloader/archive/refs/heads/main.zip)  
-     
-**Once Installed**  
-Open a console in the directory and type `pip install -r requirements.txt`  
-To run the program simply type `python converter.py`  
- 
-
-THIS TOOL IS FOR PRIVATE USE ONLY DON'T USE IT TOO BREAK COPYRIGHT LAWS OR FEDERAL LAWS!
+## Disclaimer
+This tool is for private use only. Don’t use it to violate copyright laws or local regulations.
