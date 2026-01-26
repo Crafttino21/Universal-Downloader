@@ -19,7 +19,7 @@ import subprocess
 import zipfile
 
 APP_NAME = "MultiDownloader by WeepingAngel"
-APP_VERSION = "1.5.1"
+APP_VERSION = "1.5"
 
 
 class dialogs:
@@ -118,7 +118,7 @@ banner = '''
                 Discord: _WeepingAngel_ VI#6666 | GitHub: https://www.github.com/Crafttino21
                * Thanks to Cozi to make Afterpatches and help me to clean my code *
                             # GitHub: https://github.com/itzCozi #
-                                      Version: 1.4 (Patch) 
+                                      Version: 1.5
 
 '''
 # P.S Cozi feel free to intigrate your own extensions if you want :)

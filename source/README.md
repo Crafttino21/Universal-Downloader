@@ -1,4 +1,4 @@
-# Universal-Downloader (MultiDownloader)
+# Universal-Downloader (MultiDownloader) – v1.5
 
 Ein kleines Windows-Tool zum Downloaden von Videos/Audio über `yt-dlp`.
 
@@ -14,6 +14,15 @@ Hinweis: Plattformen ändern sich regelmäßig. Wenn etwas nicht mehr geht, zuer
 - Audio → **MP3** (Batch, benötigt **FFmpeg**)
 - Optional: **FFmpeg installieren** über `--install-ffmpeg` oder Menüpunkt `[9]`
 - Optional: **cookies.txt** verwenden (für Instagram/TikTok hilfreich)
+
+## Update 1.5 (Changelog)
+- Neues **Batch-UX**: mehrere Links hintereinander downloaden, Output-Ordner wird gemerkt
+- Menü getrennt nach Plattform: **YouTube / TikTok / Instagram Reels** (MP4 & MP3)
+- **FFmpeg-Installer** mit Fallback ohne `winget` (portable nach `tools/ffmpeg/bin`)
+- **Best-Quality MP4**: bevorzugt MP4-Video + M4A-Audio und merge zu MP4 (wenn FFmpeg vorhanden)
+- YouTube **Shorts** werden automatisch unterstützt (Shorts-URL wird normalisiert)
+- Optionaler **cookies.txt**-Pfad für Reels/Logins
+- UI/Dialoge cleaner (weniger Success-Popups, mehr Batch-Summary)
 
 ## Setup (Entwicklung)
 ```powershell
