@@ -1,56 +1,67 @@
 # Universal-Downloader (MultiDownloader) – v1.5
 
-Ein kleines Windows-Tool zum Downloaden von Videos/Audio über `yt-dlp`.
+Universal-Downloader is a small Python-based Windows CLI tool that downloads videos/audio via `yt-dlp` and can also download images from a direct image URL.
 
-## Unterstützte Plattformen (über `yt-dlp`)
-- YouTube (inkl. Shorts)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X7MF230)
+
+## Supported sites (via `yt-dlp`)
+- YouTube (including Shorts)
 - TikTok
-- Instagram Reels *(häufig nur mit Login/Cookies zuverlässig)*
+- Instagram Reels *(often only reliable with login/cookies)*
 
-Hinweis: Plattformen ändern sich regelmäßig. Wenn etwas nicht mehr geht, zuerst `yt-dlp` updaten.
+Note: Platforms change frequently. If something stops working, update `yt-dlp` first.
 
 ## Features
-- Video → **MP4** (Batch: mehrere Links nacheinander)
-- Audio → **MP3** (Batch, benötigt **FFmpeg**)
-- Optional: **FFmpeg installieren** über `--install-ffmpeg` oder Menüpunkt `[9]`
-- Optional: **cookies.txt** verwenden (für Instagram/TikTok hilfreich)
+- Batch download: paste multiple URLs (one per line)
+- Video → **MP4** (best quality; merges video+audio when FFmpeg is available)
+- Audio → **MP3** (requires **FFmpeg**)
+- Optional: **FFmpeg installer** (`--install-ffmpeg` or menu `[9]`, works even without `winget`)
+- Optional: **cookies.txt** support for login-only/age-gated content
+- Image downloader: saves a direct image URL to `output.png`
 
-## Update 1.5 (Changelog)
-- Neues **Batch-UX**: mehrere Links hintereinander downloaden, Output-Ordner wird gemerkt
-- Menü getrennt nach Plattform: **YouTube / TikTok / Instagram Reels** (MP4 & MP3)
-- **FFmpeg-Installer** mit Fallback ohne `winget` (portable nach `tools/ffmpeg/bin`)
-- **Best-Quality MP4**: bevorzugt MP4-Video + M4A-Audio und merge zu MP4 (wenn FFmpeg vorhanden)
-- YouTube **Shorts** werden automatisch unterstützt (Shorts-URL wird normalisiert)
-- Optionaler **cookies.txt**-Pfad für Reels/Logins
-- UI/Dialoge cleaner (weniger Success-Popups, mehr Batch-Summary)
-
-## Setup (Entwicklung)
+## Quick start (Windows)
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-```
-
-## Start
-```powershell
 .\.venv\Scripts\python.exe converter.py
 ```
 
-## FFmpeg installieren
+## FFmpeg
+FFmpeg is required for:
+- MP3 conversion
+- Merging best-quality video+audio into a single MP4
+
+Install via:
 ```powershell
 .\.venv\Scripts\python.exe converter.py --install-ffmpeg
 ```
-Wenn `winget` fehlt/nicht funktioniert, wird eine portable FFmpeg-Version nach `tools/ffmpeg/bin` geladen.
+If `winget` is missing/doesn’t work, a portable FFmpeg build is downloaded to `tools/ffmpeg/bin`.
 
-## Batch-Download (empfohlen)
-- Menü hat jetzt getrennte Einträge für **YouTube / TikTok / Instagram Reels** (MP4 und MP3 jeweils als Batch).
-- Output-Ordner einmal auswählen
-- URLs **eine pro Zeile** einfügen
-- Leere Zeile startet den Download
-- `b` bringt dich zurück ins Menü
+## Batch mode usage (recommended)
+- Pick a menu entry (YouTube/TikTok/Instagram Reels → MP4 or MP3)
+- Choose the output folder once (it’s remembered)
+- Paste URLs **one per line**
+- Empty line starts the batch
+- Type `b` to go back to the menu
 
 ## cookies.txt (Instagram/TikTok)
-Für private/age-gated Inhalte oder Reels braucht man oft Cookies.
-Exportiere Cookies aus deinem Browser als **Netscape cookies.txt** und gib den Pfad im Batch-Dialog an.
+Instagram Reels (and sometimes TikTok) often require cookies to work reliably.
+Export your browser cookies as **Netscape cookies.txt** and enter the path when the tool asks for it.
 
-## Build (Windows, EXE)
-`WindowsAutoCompiler.bat` nutzt `pyinstaller` (`converter.spec` wird erzeugt).
+## Build (Windows EXE)
+Use `WindowsAutoCompiler.bat` (PyInstaller) or run:
+```powershell
+pyinstaller converter.py --onefile --clean
+```
+
+## Update 1.5 (Changelog)
+- New batch UX (download multiple URLs in a row, remembers output folders)
+- Menu split by platform: **YouTube / TikTok / Instagram Reels** (MP4 & MP3)
+- FFmpeg installer now works without `winget` (portable install to `tools/ffmpeg/bin`)
+- Best-quality MP4 selection (MP4 video + M4A audio, merge to MP4 when FFmpeg is available)
+- YouTube Shorts URL normalization
+- Optional cookies.txt support (especially for Reels/logins)
+- Cleaner UI (fewer popups, more batch summary in console)
+
+## Disclaimer
+This tool is for private use only. Don’t use it to violate copyright laws or local regulations.

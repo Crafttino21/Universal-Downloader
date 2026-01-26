@@ -33,3 +33,4 @@ tools/ffmpeg/
 *.webm
 *.mkv
 output.png
+demo.md
