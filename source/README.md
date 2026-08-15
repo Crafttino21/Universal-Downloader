@@ -8,6 +8,8 @@ Universal-Downloader is a small Python-based Windows CLI tool that downloads vid
 - YouTube (including Shorts)
 - TikTok
 - Instagram Reels *(often only reliable with login/cookies)*
+- Menu `[8]` — any other site `yt-dlp` supports: SoundCloud, X/Twitter, Reddit,
+  Twitch, Dailymotion, Vimeo, Facebook and ~1800 more *(X usually needs cookies)*
 
 Note: Platforms change frequently. If something stops working, update `yt-dlp` first.
 
@@ -38,21 +40,22 @@ Install via:
 If `winget` is missing/doesn’t work, a portable FFmpeg build is downloaded to `tools/ffmpeg/bin`.
 
 ## Batch mode usage (recommended)
-- Pick a menu entry (YouTube/TikTok/Instagram Reels → MP4 or MP3)
+- Pick a menu entry (YouTube/TikTok/Instagram Reels → MP4 or MP3, or `[8]` for
+  any other supported site)
 - Choose the output folder once (it’s remembered)
 - Paste URLs **one per line**
 - Empty line starts the batch
 - Type `b` to go back to the menu
 
-## cookies.txt (Instagram/TikTok)
-Instagram Reels (and sometimes TikTok) often require cookies to work reliably.
+## cookies.txt (Instagram/X/TikTok)
+Instagram Reels and X (and sometimes TikTok) often require cookies to work reliably.
 Export your browser cookies as **Netscape cookies.txt** and enter the path when the tool asks for it.
 
 ### How to use `cookies.txt` (step-by-step)
-1. Log in to the website in your browser (Instagram/TikTok) and make sure you can view the content normally.
+1. Log in to the website in your browser (Instagram/X/TikTok) and make sure you can view the content normally.
 2. Export cookies to a **Netscape-format** `cookies.txt` file (common browser extension names: “cookies.txt”, “Get cookies.txt”).
 3. Save the file somewhere safe, e.g. `C:\Users\<you>\Downloads\cookies.txt`.
-4. In this tool, pick an **Instagram Reels** menu entry (MP4 or MP3 batch).
+4. In this tool, pick an **Instagram Reels** menu entry (MP4 or MP3 batch), or `[8]` for X and other sites.
 5. When prompted for `cookies.txt`, paste the full path to your file and press Enter.
 6. Paste your URLs (one per line) and start the batch.
 

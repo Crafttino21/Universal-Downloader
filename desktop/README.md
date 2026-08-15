@@ -4,6 +4,10 @@ An Electron port of the `source/converter.py` CLI, with the same download engine
 and a proper UI: a live queue, quality selection, automatic platform detection,
 persistent history, and a light/dark theme.
 
+Branded badges for YouTube, TikTok, Instagram, X, Reddit, Twitch, SoundCloud and
+Dailymotion; every other site `yt-dlp` supports still downloads, just under a
+neutral "Link" badge.
+
 The Python engine still does the downloading. Electron is the front end.
 
 ## Architecture
@@ -146,5 +150,27 @@ Events pushed to the UI: `progress`, `status`, `done`, `failed`,
   backwards when the second stream starts.
 - **Transient YouTube errors.** A job re-extracts and retries up to three times
   on 403/429/timeout, which is the most common failure against YouTube.
-- **cookies.txt.** Instagram (and sometimes TikTok) needs one. Set it in
+- **cookies.txt.** Instagram and X (and sometimes TikTok) need one. Set it in
   Settings; it applies to probes and downloads alike.
+- **Platform detection.** `src/renderer/src/lib/platform.ts` maps a URL to a
+  badge. Matching runs against the parsed *hostname*, not a substring search —
+  `"x.com"` is a substring of `"netflix.com"`. Adding a platform means one row
+  in `PLATFORM_HOSTS`, one entry each in `PLATFORM_LABEL`/`PLATFORM_COLOR`, a
+  `--pf-*` token in `globals.css`, and the union in `shared/types.ts`; the
+  engine needs nothing, since yt-dlp already handles the site.
+- **Audio-only platforms.** SoundCloud has no video stream, so a video-mode job
+  would fall through the format ladder to the audio format and drop an `.m4a`
+  into the video folder. `AUDIO_ONLY` makes the URL bar switch to MP3 instead.
+- **The preview card.** `UrlPreview.tsx` renders everything `probe` returns —
+  thumbnail, title, uploader, runtime, playlist count. Its footer reads
+  source → result: the resolution ladder on the left, what actually lands on
+  disk on the right.
+- **The resolution ladder.** `lib/quality.ts` mirrors
+  `engine.build_video_format` to work out which height a job really produces.
+  The quality dropdown offers a fixed 2160→360 list whatever the source has, so
+  the lit rung is the only place the difference shows. Note the fallback: when
+  *nothing* is at or below the cap, the selector ends at a bare `best` and the
+  download overshoots to the highest rung — the readout turns amber for that.
+- **Thumbnails that never resolve.** Some extractors hand out URLs that hang
+  open instead of 404ing, so an `onError` fallback never fires. `Poster.tsx`
+  layers the placeholder *underneath* the image, which covers both cases.

@@ -1,7 +1,8 @@
 # Universal-Downloader (MultiDownloader)
 
-Universal-Downloader downloads videos, audio and images from YouTube, TikTok and
-Instagram via `yt-dlp`. It comes in two flavours:
+Universal-Downloader downloads videos, audio and images from YouTube, TikTok,
+Instagram, X, Reddit, Twitch, SoundCloud, Dailymotion — and the ~1800 other
+sites `yt-dlp` supports. It comes in two flavours:
 
 | | | |
 |---|---|---|
@@ -43,14 +44,30 @@ persisted.
 
 ---
 
-## CLI (v1.5)
-
 ## Supported sites (via `yt-dlp`)
-- YouTube (including Shorts)
-- TikTok
-- Instagram Reels *(often only reliable with login/cookies)*
+
+Recognised by name — the desktop app shows a coloured badge for each:
+
+| Platform | Notes |
+|---|---|
+| YouTube | Including Shorts, `youtu.be` and bare video IDs |
+| TikTok | |
+| Instagram | Reels and posts — *usually needs a cookies.txt* |
+| X (Twitter) | *Usually needs a cookies.txt; X gates most video behind login* |
+| Reddit | `v.redd.it` ships video and audio separately — FFmpeg merges them |
+| Twitch | Clips and VODs (a full VOD can be several GB) |
+| SoundCloud | Audio only — the app switches to MP3 mode by itself |
+| Dailymotion | Including `dai.ly` short links |
+
+**Anything else `yt-dlp` supports also works** — Vimeo, Facebook, Bluesky,
+Twitter Spaces and roughly 1800 more. Those just show a neutral "Link" badge
+instead of a branded one. In the CLI, use menu entry `[8]`.
 
 Note: Platforms change frequently. If something stops working, update `yt-dlp` first.
+
+---
+
+## CLI (v1.5)
 
 ## Features
 - Batch download: paste multiple URLs (one per line)
@@ -79,21 +96,22 @@ Install via:
 If `winget` is missing/doesn’t work, a portable FFmpeg build is downloaded to `tools/ffmpeg/bin`.
 
 ## Batch mode usage (recommended)
-- Pick a menu entry (YouTube/TikTok/Instagram Reels → MP4 or MP3)
+- Pick a menu entry (YouTube/TikTok/Instagram Reels → MP4 or MP3, or `[8]` for
+  any other supported site)
 - Choose the output folder once (it’s remembered)
 - Paste URLs **one per line**
 - Empty line starts the batch
 - Type `b` to go back to the menu
 
-## cookies.txt (Instagram/TikTok)
-Instagram Reels (and sometimes TikTok) often require cookies to work reliably.
+## cookies.txt (Instagram/X/TikTok)
+Instagram Reels and X (and sometimes TikTok) often require cookies to work reliably.
 Export your browser cookies as **Netscape cookies.txt** and enter the path when the tool asks for it.
 
 ### How to use `cookies.txt` (step-by-step)
-1. Log in to the website in your browser (Instagram/TikTok) and make sure you can view the content normally.
+1. Log in to the website in your browser (Instagram/X/TikTok) and make sure you can view the content normally.
 2. Export cookies to a **Netscape-format** `cookies.txt` file (common browser extension names: “cookies.txt”, “Get cookies.txt”).
 3. Save the file somewhere safe, e.g. `C:\Users\<you>\Downloads\cookies.txt`.
-4. In this tool, pick an **Instagram Reels** menu entry (MP4 or MP3 batch).
+4. In this tool, pick an **Instagram Reels** menu entry (MP4 or MP3 batch), or `[8]` for X and other sites.
 5. When prompted for `cookies.txt`, paste the full path to your file and press Enter.
 6. Paste your URLs (one per line) and start the batch.
 

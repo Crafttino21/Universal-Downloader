@@ -1,8 +1,9 @@
-import { AlertCircle, Check, FolderSearch, Play, RotateCw, X } from 'lucide-react'
+import { AlertCircle, Check, FolderSearch, RotateCw, X } from 'lucide-react'
 import type { Job, JobStatus } from '@shared/types'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { PlatformBadge } from '@/components/PlatformBadge'
+import { Poster } from '@/components/Poster'
 import { TransferMeter } from '@/components/TransferMeter'
 import { useApp } from '@/hooks/useApp'
 import { PLATFORM_COLOR } from '@/lib/platform'
@@ -67,18 +68,7 @@ export function JobCard({ job, onCancel, onRetry, onRemove }: JobCardProps): Rea
       />
 
       <div className="flex items-start gap-3">
-        {job.thumbnail ? (
-          <img
-            src={job.thumbnail}
-            alt=""
-            loading="lazy"
-            className="h-11 w-[74px] shrink-0 rounded-[6px] border border-border object-cover"
-          />
-        ) : (
-          <div className="flex h-11 w-[74px] shrink-0 items-center justify-center rounded-[6px] border border-border bg-surface-2">
-            <Play className="size-3.5 text-fg-muted/60" />
-          </div>
-        )}
+        <Poster src={job.thumbnail} mode={job.mode} className="h-11 w-[74px]" />
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">

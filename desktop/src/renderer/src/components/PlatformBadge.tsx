@@ -8,9 +8,13 @@ import { cn } from '@/lib/utils'
  */
 export function PlatformBadge({
   platform,
+  label,
   className
 }: {
   platform: Platform
+  /** Overrides the platform name — used to show yt-dlp's extractor for
+   *  unbranded sites, where "Vimeo" beats a generic "Link". */
+  label?: string
   className?: string
 }): React.JSX.Element {
   return (
@@ -26,7 +30,7 @@ export function PlatformBadge({
         style={{ backgroundColor: PLATFORM_COLOR[platform] }}
         aria-hidden="true"
       />
-      {PLATFORM_LABEL[platform]}
+      {label || PLATFORM_LABEL[platform]}
     </span>
   )
 }

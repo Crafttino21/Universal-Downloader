@@ -9,14 +9,20 @@ const de = {
   appName: 'Universal Downloader',
 
   // url bar
-  urlPlaceholder: 'Link einfügen — YouTube, TikTok oder Instagram',
+  urlPlaceholder: 'Link einfügen — YouTube, TikTok, Reddit, X und viele mehr',
   paste: 'Einfügen',
   clear: 'Leeren',
   download: 'Herunterladen',
   downloadCount: (n: number) => (n === 1 ? 'Herunterladen' : `${n} herunterladen`),
   detecting: 'Wird geprüft…',
   multipleLinks: (n: number) => `${n} Links erkannt`,
-  playlistDetected: (n: number) => `Playlist mit ${n} Videos`,
+
+  // preview card
+  playlistDetected: (n: number) => `Playlist mit ${n} Videos — nur dieser Titel wird geladen`,
+  previewIdle: 'Keine Vorschau',
+  previewSource: 'Quelle',
+  previewOvershoot: (h: number) =>
+    `Diese Quelle hat nichts unterhalb von ${h}p — du bekommst ${h}p.`,
 
   // mode & quality
   video: 'Video',
@@ -55,7 +61,7 @@ const de = {
 
   // empty states
   queueEmptyTitle: 'Nichts in der Warteschlange',
-  queueEmptyBody: 'Füge oben einen Link ein — YouTube, TikTok oder Instagram.',
+  queueEmptyBody: 'Füge oben einen Link ein — YouTube, TikTok, Reddit, X und viele mehr.',
   historyEmptyTitle: 'Noch kein Verlauf',
   historyEmptyBody: 'Abgeschlossene Downloads sammeln sich hier.',
 
@@ -101,7 +107,7 @@ const de = {
   downloads: 'Downloads',
   concurrency: 'Gleichzeitige Downloads',
   cookies: 'cookies.txt',
-  cookiesHint: 'Nötig für Instagram und private Inhalte.',
+  cookiesHint: 'Nötig für Instagram, X und private Inhalte.',
   cookiesChoose: 'Datei wählen',
   cookiesNone: 'Keine ausgewählt',
   cookiesRemove: 'Entfernen',
@@ -118,7 +124,7 @@ const de = {
   toastImageSaved: 'Bild gespeichert',
   toastNoUrl: 'Kein Link eingegeben',
   toastCookiesRecommended:
-    'Instagram braucht meist eine cookies.txt. Du kannst sie in den Einstellungen hinterlegen.',
+    'Instagram und X brauchen meist eine cookies.txt. Du kannst sie in den Einstellungen hinterlegen.',
   toastBackendLost: 'Verbindung zum Backend verloren',
   toastBackendLostBody: 'Laufende Downloads wurden gestoppt. Starte die App neu.',
   backendLabel: 'Backend',
@@ -133,14 +139,19 @@ const de = {
 const en: typeof de = {
   appName: 'Universal Downloader',
 
-  urlPlaceholder: 'Paste a link — YouTube, TikTok or Instagram',
+  urlPlaceholder: 'Paste a link — YouTube, TikTok, Reddit, X and many more',
   paste: 'Paste',
   clear: 'Clear',
   download: 'Download',
   downloadCount: (n: number) => (n === 1 ? 'Download' : `Download ${n}`),
   detecting: 'Checking…',
   multipleLinks: (n: number) => `${n} links detected`,
-  playlistDetected: (n: number) => `Playlist with ${n} videos`,
+
+  // preview card
+  playlistDetected: (n: number) => `Playlist with ${n} videos — only this one is downloaded`,
+  previewIdle: 'No preview',
+  previewSource: 'Source',
+  previewOvershoot: (h: number) => `This source has nothing below ${h}p — you'll get ${h}p.`,
 
   video: 'Video',
   audio: 'Audio',
@@ -175,7 +186,7 @@ const en: typeof de = {
   clearHistory: 'Clear history',
 
   queueEmptyTitle: 'Nothing queued',
-  queueEmptyBody: 'Paste a link above — YouTube, TikTok or Instagram.',
+  queueEmptyBody: 'Paste a link above — YouTube, TikTok, Reddit, X and many more.',
   historyEmptyTitle: 'No history yet',
   historyEmptyBody: 'Finished downloads collect here.',
 
@@ -218,7 +229,7 @@ const en: typeof de = {
   downloads: 'Downloads',
   concurrency: 'Parallel downloads',
   cookies: 'cookies.txt',
-  cookiesHint: 'Needed for Instagram and private content.',
+  cookiesHint: 'Needed for Instagram, X and private content.',
   cookiesChoose: 'Choose file',
   cookiesNone: 'None selected',
   cookiesRemove: 'Remove',
@@ -234,7 +245,7 @@ const en: typeof de = {
   toastImageSaved: 'Image saved',
   toastNoUrl: 'No link entered',
   toastCookiesRecommended:
-    'Instagram usually needs a cookies.txt. You can set one in Settings.',
+    'Instagram and X usually need a cookies.txt. You can set one in Settings.',
   toastBackendLost: 'Lost the backend connection',
   toastBackendLostBody: 'Running downloads were stopped. Restart the app.',
   backendLabel: 'Backend',

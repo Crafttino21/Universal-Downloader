@@ -625,6 +625,7 @@ class functions:
     print("[5] TikTok to MP3 (batch)")
     print("[6] Instagram Reels to MP3 (batch)")
     print("[7] Image Downloader")
+    print("[8] Other platform (SoundCloud, X, Reddit, Twitch, Dailymotion, ...)")
     print("[9] Install FFmpeg")
     print("[0] Exit\n")
 
@@ -656,6 +657,11 @@ class functions:
     last_tiktok_audio_dir = None
     last_instagram_audio_dir = None
     last_instagram_cookiefile = None
+    # yt-dlp handles far more sites than the menu names. Option [8] reaches them
+    # without giving every one of them its own pair of entries.
+    last_other_video_dir = None
+    last_other_audio_dir = None
+    last_other_cookiefile = None
 
 
     while True:
@@ -715,6 +721,32 @@ class functions:
           last_instagram_cookiefile,
           cookies_recommended=True,
         )
+        functions._render_menu()
+        continue
+
+      elif option == "8":
+        print("Other platform — anything yt-dlp supports (SoundCloud, X/Twitter,")
+        print("Reddit, Twitch, Dailymotion, Vimeo, Facebook, ...).")
+        kind = input("[1] MP4 (video)  [2] MP3 (audio) > ").strip()
+
+        if kind == "1":
+          last_other_video_dir, last_other_cookiefile = functions._run_video_batch(
+            "Other platform",
+            last_other_video_dir,
+            last_other_cookiefile,
+            cookies_recommended=True,
+          )
+        elif kind == "2":
+          last_other_audio_dir, last_other_cookiefile = functions._run_audio_batch(
+            "Other platform",
+            last_other_audio_dir,
+            last_other_cookiefile,
+            cookies_recommended=True,
+          )
+        else:
+          print("Invalid option!")
+          continue
+
         functions._render_menu()
         continue
 

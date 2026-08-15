@@ -53,6 +53,13 @@
   --pf-youtube: #ff3b30;
   --pf-tiktok: #22d3ee;
   --pf-instagram: #e1467c;
+  --pf-x: #1d9bf0;
+  --pf-reddit: #ff4500;
+  --pf-twitch: #9146ff;
+  /* SoundCloud's brand gradient runs #ff5500 → #ff8800; the lighter end keeps
+     it apart from Reddit's #ff4500 at badge size. */
+  --pf-soundcloud: #ff8800;
+  --pf-dailymotion: #0066dc;
   --pf-other: #8a94a6;
 }
 
@@ -74,6 +81,11 @@
   --color-pf-youtube: var(--pf-youtube);
   --color-pf-tiktok: var(--pf-tiktok);
   --color-pf-instagram: var(--pf-instagram);
+  --color-pf-x: var(--pf-x);
+  --color-pf-reddit: var(--pf-reddit);
+  --color-pf-twitch: var(--pf-twitch);
+  --color-pf-soundcloud: var(--pf-soundcloud);
+  --color-pf-dailymotion: var(--pf-dailymotion);
   --color-pf-other: var(--pf-other);
 
   --font-display: 'Archivo Variable', system-ui, sans-serif;

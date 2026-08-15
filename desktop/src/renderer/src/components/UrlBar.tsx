@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { PlatformBadge } from '@/components/PlatformBadge'
+import { UrlPreview } from '@/components/UrlPreview'
 import { useApp } from '@/hooks/useApp'
-import { detectPlatform, splitUrls } from '@/lib/platform'
-import { duration, shortPath } from '@/lib/format'
+import { AUDIO_ONLY, detectPlatform, splitUrls } from '@/lib/platform'
+import { shortPath } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 const VIDEO_QUALITIES: VideoQuality[] = ['best', '2160', '1440', '1080', '720', '480', '360']
@@ -32,14 +33,26 @@ export function UrlBar({ mode, onModeChange, onSubmit, busy }: UrlBarProps): Rea
   const platform = detectPlatform(urls[0] ?? '')
   const outputDir = mode === 'audio' ? settings?.audioDir : settings?.videoDir
 
+  // Worth a preview: a single entry that looks like a link rather than stray
+  // text. A recognised platform covers scheme-less pastes and bare video IDs.
+  const single = urls.length === 1 ? urls[0] : null
+  const previewable =
+    single != null && (/^https?:\/\//i.test(single) || detectPlatform(single) !== 'other')
+
+  // SoundCloud and friends have no video stream at all. Left in video mode the
+  // download would fall through to the audio-only format and land an .opus in
+  // the video folder, so follow the link instead of the toggle.
+  useEffect(() => {
+    if (mode === 'video' && AUDIO_ONLY.includes(platform)) onModeChange('audio')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [platform])
+
   // Debounced preview. A single URL is worth previewing; a batch is not.
   useEffect(() => {
     setProbe(null)
-    if (urls.length !== 1) return
+    if (!previewable || !single) return
 
-    const url = urls[0]
-    if (!/^(https?:\/\/|[\w-]{11}$)/i.test(url)) return
-
+    const url = single
     let cancelled = false
     setProbing(true)
     const timer = setTimeout(() => {
@@ -137,31 +150,26 @@ export function UrlBar({ mode, onModeChange, onSubmit, busy }: UrlBarProps): Rea
         </div>
       </div>
 
-      {/* Live preview of what was recognised */}
-      <div className="flex min-h-5 items-center gap-2 text-[12px] text-fg-muted">
-        {urls.length > 1 ? (
-          <>
-            <PlatformBadge platform={platform} />
-            <span>{t.multipleLinks(urls.length)}</span>
-          </>
-        ) : urls.length === 1 ? (
-          <>
-            <PlatformBadge platform={platform} />
-            {probing && !probe ? (
-              <span className="animate-pulse">{t.detecting}</span>
-            ) : probe ? (
-              <>
-                <span className="truncate">{probe.title}</span>
-                {probe.duration != null && (
-                  <span className="tnum shrink-0 text-fg-muted/70">
-                    {duration(probe.duration)}
-                  </span>
-                )}
-              </>
-            ) : null}
-          </>
-        ) : null}
-      </div>
+      {/* What was recognised: a full card for one link, a count for a batch. */}
+      {urls.length > 1 ? (
+        <div className="flex min-h-5 items-center gap-2 text-[12px] text-fg-muted">
+          <PlatformBadge platform={platform} />
+          <span>{t.multipleLinks(urls.length)}</span>
+        </div>
+      ) : previewable ? (
+        <UrlPreview
+          platform={platform}
+          probe={probe}
+          probing={probing}
+          mode={mode}
+          videoQuality={settings?.videoQuality ?? 'best'}
+          audioBitrate={settings?.audioBitrate ?? '192'}
+        />
+      ) : urls.length === 1 ? (
+        <div className="flex min-h-5 items-center gap-2 text-[12px] text-fg-muted">
+          <PlatformBadge platform={platform} />
+        </div>
+      ) : null}
 
       {/* Controls: mode, quality, destination, action */}
       <div className="flex flex-wrap items-center gap-2">

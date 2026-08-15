@@ -67,7 +67,7 @@ export function App(): React.JSX.Element | null {
 
     if (!media.length) return
 
-    // Instagram is the platform that most often needs a login.
+    // Instagram and X are the platforms that most often need a login.
     if (
       !settings.cookiefile &&
       !cookieHintShown &&

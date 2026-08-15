@@ -4,7 +4,16 @@
  * file in sync with `python/daemon.py`.
  */
 
-export type Platform = 'youtube' | 'tiktok' | 'instagram' | 'other'
+export type Platform =
+  | 'youtube'
+  | 'tiktok'
+  | 'instagram'
+  | 'x'
+  | 'reddit'
+  | 'twitch'
+  | 'soundcloud'
+  | 'dailymotion'
+  | 'other'
 
 export type DownloadMode = 'video' | 'audio'
 
