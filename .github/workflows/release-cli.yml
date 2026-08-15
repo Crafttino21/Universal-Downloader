@@ -41,7 +41,10 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-          PREV=$(git tag -l 'cli-v*' --sort=-v:refname | grep -vx "$TAG" | head -n1)
+          # `|| true` because grep exits 1 when nothing is left — the normal case
+          # for the first tag of a line, which would otherwise abort the step
+          # under the runner's `set -eo pipefail`.
+          PREV=$(git tag -l 'cli-v*' --sort=-v:refname | grep -vx "$TAG" | head -n1 || true)
           echo "prev=$PREV" >> "$GITHUB_OUTPUT"
           echo "Building $VERSION (tag '$TAG', previous '$PREV')"
 

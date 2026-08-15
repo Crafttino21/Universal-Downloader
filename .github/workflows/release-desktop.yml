@@ -47,7 +47,10 @@ jobs:
 
           # Notes start at the previous desktop release, so CLI tags in between
           # don't drag unrelated commits into the changelog.
-          PREV=$(git tag -l 'desktop-v*' --sort=-v:refname | grep -vx "$TAG" | head -n1)
+          # `|| true` because grep exits 1 when nothing is left — which is the
+          # normal case for the first tag of a line, and would otherwise abort
+          # the step under the runner's `set -eo pipefail`.
+          PREV=$(git tag -l 'desktop-v*' --sort=-v:refname | grep -vx "$TAG" | head -n1 || true)
           echo "prev=$PREV" >> "$GITHUB_OUTPUT"
           echo "Building $VERSION (tag '$TAG', previous '$PREV')"
 
