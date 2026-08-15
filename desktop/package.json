@@ -1,7 +1,7 @@
 {
   "name": "universal-downloader-desktop",
   "version": "2.1.0",
-  "description": "Universal Downloader — Electron desktop app for YouTube, TikTok and Instagram",
+  "description": "Universal Downloader — Electron desktop app for YouTube, TikTok, Instagram, X, Reddit, Twitch, SoundCloud, Dailymotion and 1000+ more sites",
   "main": "./out/main/index.js",
   "author": "WeepingAngel",
   "license": "MIT",
@@ -48,7 +48,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "electron": "^43.4.0",
-    "electron-builder": "^25.1.8",
+    "electron-builder": "^26.15.3",
     "electron-vite": "^3.0.0",
     "lucide-react": "^0.477.0",
     "react": "^19.0.0",
