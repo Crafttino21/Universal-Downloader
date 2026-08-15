@@ -1,0 +1,129 @@
+name: Release CLI
+
+# `cli-v*` tags build the original console tool. Kept separate from the desktop
+# app so both keep their own version line.
+on:
+  push:
+    tags:
+      - 'cli-v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build for a dry run (no release is created)'
+        required: true
+        default: '0.0.0-dev'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ inputs.version }}"
+            TAG=""
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+            VERSION="${TAG#cli-v}"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+          PREV=$(git tag -l 'cli-v*' --sort=-v:refname | grep -vx "$TAG" | head -n1)
+          echo "prev=$PREV" >> "$GITHUB_OUTPUT"
+          echo "Building $VERSION (tag '$TAG', previous '$PREV')"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: source/requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip pyinstaller -r source/requirements.txt
+
+      - name: Stamp version
+        run: python .github/scripts/set_cli_version.py "${{ steps.version.outputs.version }}"
+
+      - name: Build
+        # Same flags WindowsAutoCompiler.bat has always used, plus a name and the
+        # icon the desktop app introduced — the CLI exe never had one.
+        #
+        # --icon must be absolute: PyInstaller resolves it relative to --specpath,
+        # not the working directory, so a relative path silently looks inside
+        # build/ and fails.
+        run: |
+          pyinstaller source/converter.py \
+            --onefile --clean --noconfirm \
+            --name "universal-downloader-cli-${{ steps.version.outputs.version }}" \
+            --icon "$GITHUB_WORKSPACE/desktop/build/icon.ico" \
+            --distpath dist --workpath build --specpath build
+
+      - name: Verify artifact
+        run: |
+          EXE="dist/universal-downloader-cli-${{ steps.version.outputs.version }}.exe"
+          [ -f "$EXE" ] || { echo "::error::missing artifact: $EXE"; exit 1; }
+          ls -l "$EXE"
+          # A failed bundling step can still leave the bare bootloader behind —
+          # a few hundred KB rather than the ~15 MB a real onefile build weighs.
+          # Existence alone is not proof the build worked.
+          SIZE=$(stat -c%s "$EXE")
+          if [ "$SIZE" -lt 8000000 ]; then
+            echo "::error::$EXE is only $SIZE bytes — bundling did not complete"
+            exit 1
+          fi
+
+      - name: Smoke-test the exe
+        run: |
+          # --install-ffmpeg exits after its check, so this exercises real startup
+          # without opening the interactive menu.
+          UD_NO_UPDATE_CHECK=1 "dist/universal-downloader-cli-${{ steps.version.outputs.version }}.exe" --help
+
+      - name: Upload dry-run artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ steps.version.outputs.version }}
+          path: dist/*.exe
+
+      - name: Create draft release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NOTES_ARG=""
+          if [ -n "${{ steps.version.outputs.prev }}" ]; then
+            NOTES_ARG="--notes-start-tag ${{ steps.version.outputs.prev }}"
+          fi
+          # --latest=false is load-bearing: GitHub keeps one "latest release" per
+          # repo, and electron-updater reads /releases/latest to find the desktop
+          # app's latest.yml. A CLI release taking that slot breaks auto-update
+          # for every installed desktop app. release-guard.yml enforces this too.
+          gh release create "${{ steps.version.outputs.tag }}" \
+            --draft \
+            --latest=false \
+            --title "CLI v${{ steps.version.outputs.version }}" \
+            --generate-notes $NOTES_ARG \
+            "dist/universal-downloader-cli-${{ steps.version.outputs.version }}.exe"
+
+      - name: Summary
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          {
+            echo "### CLI v${{ steps.version.outputs.version }} — draft created"
+            echo ""
+            echo "Publish with **Set as the latest release** switched OFF."
+            echo "That slot belongs to the desktop app's auto-updater."
+          } >> "$GITHUB_STEP_SUMMARY"

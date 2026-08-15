@@ -48,6 +48,18 @@ If `winget` is missing/doesn’t work, a portable FFmpeg build is downloaded to 
 Instagram Reels (and sometimes TikTok) often require cookies to work reliably.
 Export your browser cookies as **Netscape cookies.txt** and enter the path when the tool asks for it.
 
+### How to use `cookies.txt` (step-by-step)
+1. Log in to the website in your browser (Instagram/TikTok) and make sure you can view the content normally.
+2. Export cookies to a **Netscape-format** `cookies.txt` file (common browser extension names: “cookies.txt”, “Get cookies.txt”).
+3. Save the file somewhere safe, e.g. `C:\Users\<you>\Downloads\cookies.txt`.
+4. In this tool, pick an **Instagram Reels** menu entry (MP4 or MP3 batch).
+5. When prompted for `cookies.txt`, paste the full path to your file and press Enter.
+6. Paste your URLs (one per line) and start the batch.
+
+Notes:
+- Keep `cookies.txt` private: it can contain session tokens (treat it like a password).
+- Cookies can expire; if downloads start failing again, export a fresh `cookies.txt`.
+
 ## Build (Windows EXE)
 Use `WindowsAutoCompiler.bat` (PyInstaller) or run:
 ```powershell

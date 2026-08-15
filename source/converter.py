@@ -19,7 +19,7 @@ import subprocess
 import zipfile
 
 APP_NAME = "MultiDownloader by WeepingAngel"
-APP_VERSION = "1.5"
+APP_VERSION = "1.6.0"
 
 
 class dialogs:
@@ -105,7 +105,9 @@ class dialogs:
 
 
 
-banner = '''
+# f-string so APP_VERSION above stays the single place the version is written.
+# The release pipeline rewrites that one line and the banner follows.
+banner = f'''
 
 ███╗   ███╗██╗   ██╗██╗  ████████╗██╗██████╗  ██████╗ ██╗    ██╗███╗   ██╗██╗      ██████╗  █████╗ ██████╗ 
 ████╗ ████║██║   ██║██║  ╚══██╔══╝██║██╔══██╗██╔═══██╗██║    ██║████╗  ██║██║     ██╔═══██╗██╔══██╗██╔══██╗
@@ -118,7 +120,7 @@ banner = '''
                 Discord: _WeepingAngel_ VI#6666 | GitHub: https://www.github.com/Crafttino21
                * Thanks to Cozi to make Afterpatches and help me to clean my code *
                             # GitHub: https://github.com/itzCozi #
-                                      Version: 1.5
+                                      Version: {APP_VERSION}
 
 '''
 # P.S Cozi feel free to intigrate your own extensions if you want :)
@@ -266,8 +268,15 @@ class syscalls:
     parser = argparse.ArgumentParser(description="Install ffmpeg (winget if available, otherwise portable download).")
     parser.add_argument("--install-ffmpeg", action="store_true",
                         help="Install's ffmpeg (winget if available, otherwise downloads a portable build).")
+    parser.add_argument("--no-update-check", action="store_true",
+                        help="Skip the version check against GitHub on startup.")
 
     args = parser.parse_args()
+
+    if args.no_update_check:
+      # Reuses the same switch check_for_update() already honours, so there is
+      # one place that decides whether the check runs.
+      os.environ["UD_NO_UPDATE_CHECK"] = "1"
 
     if args.install_ffmpeg:
       if syscalls.check_ffmpeg_installed():
@@ -279,6 +288,57 @@ class syscalls:
       return True
 
     return False
+
+
+RELEASES_API = "https://api.github.com/repos/Crafttino21/Universal-Downloader/releases"
+RELEASES_PAGE = "https://github.com/Crafttino21/Universal-Downloader/releases"
+# CLI releases are tagged cli-vX.Y.Z; the desktop app has its own line under
+# desktop-v*. That is why the release list is scanned instead of /releases/latest,
+# which points at whichever of the two was published last.
+CLI_TAG_PREFIX = "cli-v"
+
+
+def _version_tuple(text):
+  parts = []
+  for chunk in str(text).strip().split("."):
+    digits = "".join(c for c in chunk if c.isdigit())
+    parts.append(int(digits) if digits else 0)
+  return tuple(parts)
+
+
+def check_for_update(timeout=2.5):
+  '''
+  Returns the newest CLI version string if it is newer than this build, else None.
+  Every failure is swallowed on purpose: no network, a proxy, a rate limit or a
+  changed API shape must never stop the tool from starting.
+  '''
+  if os.environ.get("UD_NO_UPDATE_CHECK"):
+    return None
+  try:
+    response = requests.get(
+      RELEASES_API,
+      params={"per_page": 20},
+      timeout=timeout,
+      headers={"Accept": "application/vnd.github+json"},
+    )
+    response.raise_for_status()
+
+    newest = None
+    for release in response.json():
+      if release.get("draft"):
+        continue
+      tag = str(release.get("tag_name") or "")
+      if not tag.startswith(CLI_TAG_PREFIX):
+        continue
+      candidate = tag[len(CLI_TAG_PREFIX):]
+      if newest is None or _version_tuple(candidate) > _version_tuple(newest):
+        newest = candidate
+
+    if newest and _version_tuple(newest) > _version_tuple(APP_VERSION):
+      return newest
+  except Exception:
+    pass
+  return None
 
 
 class YoutubeBeta(): # a new method for testing to replace pyTube, Its just a small fix
@@ -682,6 +742,12 @@ def main():
   time.sleep(1)
   try:
     print(f"{APP_NAME} | Version: {APP_VERSION}")
+
+    newer = check_for_update()
+    if newer:
+      print(f"\n  ! Version {newer} is available (you have {APP_VERSION})")
+      print(f"    {RELEASES_PAGE}\n")
+
     functions.menu()
   except Exception as e:
     print(f"An unkown runtime error occured \n{e}\n")

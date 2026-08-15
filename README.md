@@ -1,8 +1,49 @@
-# Universal-Downloader (MultiDownloader) – v1.5
+# Universal-Downloader (MultiDownloader)
 
-Universal-Downloader is a small Python-based Windows CLI tool that downloads videos/audio via `yt-dlp` and can also download images from a direct image URL.
+Universal-Downloader downloads videos, audio and images from YouTube, TikTok and
+Instagram via `yt-dlp`. It comes in two flavours:
+
+| | | |
+|---|---|---|
+| **[Desktop app](desktop/)** | v2.0 | Electron UI with a live download queue, quality selection, history and a light/dark theme. Same Python engine underneath. |
+| **[CLI](source/)** | v1.5 | The original Python console tool. Still fully supported. |
+
+Both share the same downloader logic — the desktop app runs it as a background
+daemon instead of a menu loop.
+
+**[→ Download the latest release](https://github.com/Crafttino21/Universal-Downloader/releases)**
+— a setup and a portable exe for the desktop app, a single exe for the CLI.
+Nothing else to install; the desktop app fetches FFmpeg itself on first use and
+keeps itself up to date from there.
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X7MF230)
+
+---
+
+## Desktop app (v2.0)
+
+```powershell
+cd desktop
+npm install
+python -m venv python\.venv
+.\python\.venv\Scripts\python.exe -m pip install -r python\requirements.txt
+npm run dev
+```
+
+Build a release with `npm run dist` (or double-click
+`desktop\build-windows.bat`). It produces two self-contained files in
+`desktop\dist\` — a **setup.exe** installer and a **portable.exe** that runs
+without installing. Both bundle the Python backend, so end users need neither
+Python nor a manual FFmpeg install. See [desktop/README.md](desktop/README.md).
+
+Extras over the CLI: parallel downloads with live speed/ETA, cancel, automatic
+platform detection with a title/thumbnail preview, per-type output folders,
+download history, silent auto-update, and DE/EN + light/dark switching — all
+persisted.
+
+---
+
+## CLI (v1.5)
 
 ## Supported sites (via `yt-dlp`)
 - YouTube (including Shorts)

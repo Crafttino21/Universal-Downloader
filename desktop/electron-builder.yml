@@ -1,0 +1,56 @@
+appId: com.weepingangel.universaldownloader
+productName: Universal Downloader
+directories:
+  buildResources: build
+  output: dist
+
+# electron-builder never publishes here — it can only tag `v${version}`, and our
+# release tags are prefixed (`desktop-v2.1.0`) so the CLI can have its own line.
+# The workflow uploads with `gh release create` instead. This block still earns
+# its keep twice over: it makes `dist/latest.yml` appear, and it writes
+# `app-update.yml` into the packaged app, which is where electron-updater reads
+# the feed URL from at runtime.
+publish:
+  provider: github
+  owner: Crafttino21
+  repo: Universal-Downloader
+  releaseType: draft
+
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!python/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml,package-lock.json}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json,components.json}'
+
+# The PyInstaller-built Python daemon is shipped as an unpacked resource so it
+# can be spawned as a child process. Built by `npm run build:python`.
+extraResources:
+  - from: resources/python
+    to: python
+    filter: ['**/*']
+
+asarUnpack:
+  - resources/**
+
+win:
+  executableName: universal-downloader
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+
+nsis:
+  artifactName: ${name}-${version}-setup.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
+portable:
+  artifactName: ${name}-${version}-portable.${ext}

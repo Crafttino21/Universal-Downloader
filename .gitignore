@@ -1,0 +1,5 @@
+# The CLI release workflow builds into repo-root dist/ and build/. Those are
+# ephemeral on the runner, but keep them out of the way if the workflow's build
+# step is ever reproduced locally.
+/dist/
+/build/

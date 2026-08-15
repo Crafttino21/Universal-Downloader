@@ -1,0 +1,14 @@
+node_modules/
+dist/
+out/
+.DS_Store
+*.log
+
+# Python backend
+python/.venv/
+python/build/
+python/__pycache__/
+python/dist/
+
+# PyInstaller sidecar output (built by `npm run build:python`)
+resources/python/

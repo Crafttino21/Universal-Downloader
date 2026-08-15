@@ -1,0 +1,6 @@
+# The [default] extra pulls in yt-dlp's optional runtime helpers (mutagen,
+# pycryptodomex, websockets, brotli). [curl-cffi] adds browser TLS impersonation
+# and pins a version yt-dlp actually supports — TikTok's extractor warns and
+# frequently fails without it.
+yt-dlp[default,curl-cffi]
+requests

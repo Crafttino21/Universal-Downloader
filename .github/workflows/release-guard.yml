@@ -1,0 +1,30 @@
+name: Release Guard
+
+# electron-updater resolves the desktop app's update feed through
+# GET /releases/latest, then downloads latest.yml from whatever tag it names.
+# GitHub allows exactly one "latest" release per repository, so a CLI release in
+# that slot leaves the updater looking for a latest.yml that isn't there and
+# every installed desktop app stops receiving updates.
+#
+# The CLI workflow already passes --latest=false, but publishing a draft through
+# the web UI can hand the slot over anyway. This puts it back.
+on:
+  release:
+    types: [released, edited]
+
+permissions:
+  contents: write
+
+jobs:
+  demote-cli-release:
+    if: startsWith(github.event.release.tag_name, 'cli-')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure the CLI release is not marked latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api -X PATCH \
+            "repos/${{ github.repository }}/releases/${{ github.event.release.id }}" \
+            -f make_latest=false > /dev/null
+          echo "Demoted ${{ github.event.release.tag_name }} — /releases/latest stays with the desktop app."
