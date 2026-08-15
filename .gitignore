@@ -3,3 +3,7 @@
 # step is ever reproduced locally.
 /dist/
 /build/
+
+# Local deployment helper — personal tooling, deliberately not shared. It also
+# has to stay ignored for its own "working tree is clean" check to pass.
+/deployment.bat
