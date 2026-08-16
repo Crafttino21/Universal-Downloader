@@ -1,6 +1,6 @@
 {
   "name": "universal-downloader-desktop",
-  "version": "2.1.0",
+  "version": "2.2.1",
   "description": "Universal Downloader — Electron desktop app for YouTube, TikTok, Instagram, X, Reddit, Twitch, SoundCloud, Dailymotion and 1000+ more sites",
   "main": "./out/main/index.js",
   "author": "WeepingAngel",
