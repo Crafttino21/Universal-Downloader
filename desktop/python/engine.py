@@ -8,6 +8,7 @@ callbacks instead so the Electron UI can render progress itself.
 
 from __future__ import annotations
 
+import math
 import os
 import re
 import shutil
@@ -116,6 +117,202 @@ def build_video_format(quality: str, has_ffmpeg: bool) -> str:
     return f"best[ext=mp4][height<={height}]/best[height<={height}]/best"
 
 
+# --------------------------------------------------------------------------
+# Audio selection
+#
+# The bitrate setting is a *ceiling on the source stream*, exactly like
+# `videoQuality` is a ceiling on height — not a re-encode target. Picking 128 on
+# a track that carries 160/128/96 downloads the real 128 kbps stream instead of
+# squeezing the 160 one down, so nothing is ever re-encoded without cause.
+#
+# `audio_options` precomputes the whole menu for the renderer, so the UI never
+# has to re-implement any of this.
+# --------------------------------------------------------------------------
+
+def normalize_acodec(acodec: Optional[str]) -> str:
+    """Predict what ffprobe will call this codec.
+
+    yt-dlp's ``FFmpegExtractAudioPP`` decides copy-vs-encode by comparing its
+    target format against ffprobe's answer, so ``mp4a.40.2`` has to collapse to
+    ``aac`` here or we'd mispredict the whole thing.
+    """
+    a = (acodec or "").lower().strip()
+    if not a or a == "none":
+        return ""
+    if a.startswith("mp4a") or a.startswith("aac"):
+        return "aac"
+    if a.startswith("mp3"):
+        return "mp3"
+    if a.startswith("opus"):
+        return "opus"
+    if a.startswith("vorbis"):
+        return "vorbis"
+    return a
+
+
+def _is_audio_only(fmt: dict) -> bool:
+    return (fmt.get("vcodec") in (None, "none")) and (fmt.get("acodec") not in (None, "none"))
+
+
+def _format_abr(fmt: dict, audio_only: bool) -> Optional[float]:
+    abr = fmt.get("abr")
+    # `tbr` is the whole stream — only equal to the audio rate when there is no
+    # video riding along.
+    if abr is None and audio_only:
+        abr = fmt.get("tbr")
+    if abr is None:
+        return None
+    try:
+        value = float(abr)
+    except (TypeError, ValueError):
+        return None
+    return value if value > 0 else None
+
+
+# Codecs `FFmpegExtractAudio` can drop into a common container untouched — AAC
+# into .m4a, MP3 into .mp3. Anything else has to be re-encoded.
+_COPYABLE_ACODECS = ("aac", "mp3")
+
+
+def choose_audio(formats: list, cap=None) -> Optional[dict]:
+    """The one audio stream to download, given a ceiling in kbps.
+
+    Prefers a stream that can be copied losslessly over one that would have to be
+    re-encoded, and within that the highest rate the ceiling allows. Like
+    `build_video_format`, a ceiling nothing meets falls back to the source's best
+    rather than failing.
+
+    This is used *as* yt-dlp's format selector (see `audio_format_selector`), so
+    what the preview promises and what gets downloaded cannot drift apart.
+    """
+    audio_only = [f for f in formats if _is_audio_only(f)]
+    limit = float(cap) if cap not in (None, "", "auto") else None
+
+    def best(pool: list, audio: bool = True) -> Optional[dict]:
+        rated = [(f, _format_abr(f, audio)) for f in pool]
+        rated = [(f, abr) for f, abr in rated if abr is not None]
+        if not rated:
+            return pool[0] if pool else None
+        return max(rated, key=lambda pair: pair[1])[0]
+
+    def fits(fmt: dict) -> bool:
+        abr = _format_abr(fmt, True)
+        return limit is None or (abr is not None and abr <= limit)
+
+    copyable = [
+        f for f in audio_only if normalize_acodec(f.get("acodec")) in _COPYABLE_ACODECS
+    ]
+
+    tiers = [[f for f in copyable if fits(f)], [f for f in audio_only if fits(f)]]
+    if limit is not None:
+        tiers += [copyable, audio_only]
+
+    for pool in tiers:
+        chosen = best(pool)
+        if chosen is not None:
+            return chosen
+
+    # No audio-only stream at all — fall back to whatever carries sound.
+    return best(formats, audio=False)
+
+
+def audio_format_selector(cap):
+    """`choose_audio` wrapped as a yt-dlp format selector callable.
+
+    yt-dlp accepts a callable for ``format`` and calls it with a context holding
+    the format list (``YoutubeDL._select_formats``).
+    """
+
+    def selector(ctx):
+        chosen = choose_audio(ctx.get("formats") or [], cap)
+        if chosen is not None:
+            yield chosen
+
+    return selector
+
+
+def pick_source_audio(info: dict, cap=None) -> tuple:
+    """``(abr, acodec, ext)`` of the stream `choose_audio` settles on."""
+    chosen = choose_audio(info.get("formats") or [], cap)
+    if chosen is None:
+        # Some extractors return a bare single format instead of a list.
+        chosen = info
+    return (
+        _format_abr(chosen, _is_audio_only(chosen)),
+        normalize_acodec(chosen.get("acodec")),
+        chosen.get("ext"),
+    )
+
+
+def decide_audio(requested, src_abr: Optional[float], src_acodec: Optional[str]) -> tuple:
+    """Container and quality for the stream that was selected.
+
+    Returns ``(preferredcodec, preferredquality, summary)``. ``preferredquality``
+    of ``None`` means "no re-encode" — yt-dlp copies the stream as-is.
+
+    ``requested`` only matters when the source told us nothing; otherwise the cap
+    already did the choosing in `choose_audio`, and all that's left is to
+    keep the bits we downloaded rather than run them through ffmpeg again.
+    """
+    codec = normalize_acodec(src_acodec)
+
+    # Nothing known about the source (extractor reported no formats). Fall back
+    # to the old fixed-bitrate behaviour rather than guessing.
+    if not codec or not src_abr:
+        quality = "192" if str(requested or "auto") == "auto" else str(requested)
+        return "mp3", quality, f"MP3 · {quality} kbps"
+
+    kbps = int(round(src_abr))
+
+    # Same codec in, same codec out: yt-dlp runs `-acodec copy`.
+    if codec == "mp3":
+        return "mp3", None, f"MP3 · {kbps} kbps (Original)"
+    # aac -> m4a is a container swap, not a re-encode.
+    if codec == "aac":
+        return "m4a", None, f"M4A · {kbps} kbps (Original)"
+
+    # opus, vorbis, … — nothing common copies these, so encode at the source's
+    # own rate. Going higher would only inflate the file.
+    return "mp3", str(kbps), f"MP3 · {kbps} kbps"
+
+
+def audio_options(info: dict) -> list:
+    """The whole bitrate menu for one source, best first.
+
+    One entry per rate the source actually carries, each already resolved to what
+    picking it produces — so the renderer just renders and never re-derives.
+    """
+    rates = _distinct_audio_bitrates(info)
+    options: list = []
+    seen = set()
+
+    for rate in rates:
+        abr, acodec, _ = pick_source_audio(info, cap=rate)
+        if not abr:
+            continue
+        codec, quality, _summary = decide_audio(rate, abr, acodec)
+        container = "m4a" if codec == "m4a" else "mp3"
+        kbps = int(quality) if quality else int(round(abr))
+        # Two caps that resolve to the same file are one choice, not two.
+        key = (kbps, container)
+        if key in seen:
+            continue
+        seen.add(key)
+        options.append(
+            {
+                "cap": rate,
+                "kbps": kbps,
+                "container": container,
+                "copied": quality is None,
+                # Forwarded into the job so the engine can skip its own probe.
+                "abr": abr,
+                "acodec": acodec,
+            }
+        )
+
+    return options
+
+
 def build_outtmpl(output_path: str) -> str:
     """converter.py:331-335 — let yt-dlp pick the extension."""
     if (
@@ -185,12 +382,15 @@ class Engine:
                 raise RuntimeError(
                     "FFmpeg not found. MP3 conversion requires FFmpeg — install it from the banner."
                 )
-            opts["format"] = "bestaudio[ext=m4a]/bestaudio/best"
+            opts["format"] = audio_format_selector(job.get("audioBitrate"))
+            codec, quality, _ = decide_audio(
+                job.get("audioBitrate"), job.get("sourceAbr"), job.get("sourceAcodec")
+            )
             opts["postprocessors"] = [
                 {
                     "key": "FFmpegExtractAudio",
-                    "preferredcodec": "mp3",
-                    "preferredquality": str(job.get("audioBitrate") or "192"),
+                    "preferredcodec": codec,
+                    "preferredquality": quality,
                 }
             ]
         else:
@@ -230,6 +430,7 @@ class Engine:
                 "uploader": info.get("uploader") or first.get("uploader"),
                 "extractor": info.get("extractor_key"),
                 "heights": _distinct_heights(first),
+                "audioOptions": audio_options(first),
                 "isPlaylist": True,
                 "playlistCount": len(entries),
             }
@@ -241,11 +442,53 @@ class Engine:
             "uploader": info.get("uploader"),
             "extractor": info.get("extractor_key"),
             "heights": _distinct_heights(info),
+            "audioOptions": audio_options(info),
             "isPlaylist": False,
             "playlistCount": None,
         }
 
     # -- download ----------------------------------------------------------
+
+    def _ensure_source_audio(self, job: dict, url: str) -> None:
+        """Fill in the source's audio rate/codec when the caller didn't.
+
+        The URL bar previews single links and hands the values over, so this only
+        fires for batch pastes and retries. Without them the clamp has nothing to
+        clamp against and we'd be back to blindly upscaling.
+        """
+        if job.get("mode") != "audio":
+            return
+        if job.get("sourceAbr") and job.get("sourceAcodec"):
+            return
+
+        opts: dict = {
+            "quiet": True,
+            "no_warnings": True,
+            "noplaylist": not job.get("playlist", False),
+            "nocheckcertificate": True,
+            "skip_download": True,
+            "logger": _NullLogger(),
+        }
+        if job.get("cookiefile"):
+            opts["cookiefile"] = job["cookiefile"]
+
+        try:
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                info = ydl.extract_info(url, download=False)
+        except Exception:
+            # Metadata is an optimisation, not a precondition — `decide_audio`
+            # falls back to the unclamped behaviour when it learns nothing.
+            return
+
+        if info and info.get("_type") == "playlist":
+            entries = [e for e in (info.get("entries") or []) if e]
+            info = entries[0] if entries else None
+        if not info:
+            return
+
+        abr, acodec, _ = pick_source_audio(info, cap=job.get("audioBitrate"))
+        job["sourceAbr"] = abr
+        job["sourceAcodec"] = acodec or None
 
     def download(
         self,
@@ -287,6 +530,7 @@ class Engine:
         is_cancelled: Callable[[], bool],
     ) -> dict:
         url = normalize_youtube_url(job["url"])
+        self._ensure_source_audio(job, url)
         opts = self.build_opts(job)
 
         last_emit = [0.0]
@@ -381,10 +625,19 @@ class Engine:
         if filepath and os.path.isfile(filepath):
             filesize = os.path.getsize(filepath)
 
+        # What the user actually got, not what they asked for — the two differ
+        # whenever the source couldn't back the requested bitrate.
+        audio_summary = None
+        if job["mode"] == "audio":
+            audio_summary = decide_audio(
+                job.get("audioBitrate"), job.get("sourceAbr"), job.get("sourceAcodec")
+            )[2]
+
         return {
             "filepath": filepath,
             "filesize": filesize,
             "title": info.get("title"),
+            "audioSummary": audio_summary,
         }
 
     # -- image -------------------------------------------------------------
@@ -442,6 +695,24 @@ def _distinct_heights(info: dict) -> list:
     if not heights and isinstance(info.get("height"), int):
         heights.add(info["height"])
     return sorted(heights, reverse=True)
+
+
+def _distinct_audio_bitrates(info: dict) -> list:
+    """The rates of the source's audio-only streams, descending.
+
+    Muxed formats are left out on purpose: their rate can't be selected on its
+    own, so offering it would promise a choice that doesn't exist.
+    """
+    rates = set()
+    for fmt in info.get("formats") or []:
+        if not _is_audio_only(fmt):
+            continue
+        abr = _format_abr(fmt, True)
+        if abr:
+            # Round *up*, or a rate of 129.5 would yield a ceiling of 129 that
+            # excludes the very stream it came from.
+            rates.add(math.ceil(abr))
+    return sorted(rates, reverse=True)
 
 
 def _final_filepath(info: dict) -> Optional[str]:

@@ -10,6 +10,7 @@ import type {
   VideoQuality
 } from '@shared/types'
 import { detectPlatform } from '@/lib/platform'
+import { effectiveAudio } from '@/lib/quality'
 import type { Dictionary } from '@/lib/i18n'
 
 interface EnqueueOptions {
@@ -78,6 +79,9 @@ export function useQueue(t: Dictionary): {
 
     const offDone = window.api.onDone((d) => {
       const job = jobsRef.current.find((j) => j.id === d.jobId)
+      // The engine reports what it actually wrote, which beats the requested
+      // bitrate whenever the source couldn't back it.
+      const quality = d.audioSummary ?? job?.quality ?? ''
       patch(d.jobId, {
         status: 'done',
         percent: 100,
@@ -85,7 +89,8 @@ export function useQueue(t: Dictionary): {
         eta: null,
         filepath: d.filepath,
         filesize: d.filesize,
-        title: d.title ?? job?.title ?? null
+        title: d.title ?? job?.title ?? null,
+        quality
       })
 
       if (job && d.filepath) {
@@ -95,7 +100,7 @@ export function useQueue(t: Dictionary): {
           url: job.url,
           platform: job.platform,
           mode: job.mode,
-          quality: job.quality,
+          quality,
           filepath: d.filepath,
           filesize: d.filesize,
           completedAt: Date.now()
@@ -134,7 +139,15 @@ export function useQueue(t: Dictionary): {
   /* ---------------- actions ---------------- */
 
   const startJob = useCallback(
-    async (job: Job, settings: Settings, outputDir: string, hasMetadata = false) => {
+    async (
+      job: Job,
+      settings: Settings,
+      outputDir: string,
+      hasMetadata = false,
+      preview?: ProbeResult | null
+    ) => {
+      // Which of the source's streams the stored ceiling resolves to.
+      const chosen = job.mode === 'audio' ? effectiveAudio(preview ?? null, settings.audioBitrate) : null
       try {
         await window.api.startJob({
           jobId: job.id,
@@ -144,7 +157,11 @@ export function useQueue(t: Dictionary): {
           videoQuality: settings.videoQuality,
           audioBitrate: settings.audioBitrate,
           cookiefile: settings.cookiefile,
-          playlist: false
+          playlist: false,
+          // Saves the engine a second extraction; it probes for itself when
+          // these are absent, so a batch paste resolves just the same.
+          sourceAbr: chosen?.abr ?? null,
+          sourceAcodec: chosen?.acodec ?? null
         })
       } catch (err) {
         patch(job.id, { status: 'failed', error: (err as Error).message })
@@ -189,9 +206,13 @@ export function useQueue(t: Dictionary): {
         title: usePreview ? preview!.title : null,
         thumbnail: usePreview ? preview!.thumbnail : null,
         duration: usePreview ? preview!.duration : null,
+        // Provisional for audio: the real bitrate depends on the source and only
+        // becomes known when the job finishes (`audioSummary` in `onDone`).
         quality:
           mode === 'audio'
-            ? `${audioBitrate} kbps`
+            ? audioBitrate === 'auto'
+              ? t.bitrateAuto
+              : `${audioBitrate} kbps`
             : videoQuality === 'best'
               ? t.qualityBest
               : `${videoQuality}p`,
@@ -207,7 +228,11 @@ export function useQueue(t: Dictionary): {
       }))
 
       setJobs((prev) => [...created, ...prev])
-      await Promise.all(created.map((job) => startJob(job, settings, outputDir, usePreview)))
+      await Promise.all(
+        created.map((job) =>
+          startJob(job, settings, outputDir, usePreview, usePreview ? preview : null)
+        )
+      )
       return created.length
     },
     [startJob, t]

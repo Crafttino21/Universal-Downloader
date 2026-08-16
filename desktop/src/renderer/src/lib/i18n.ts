@@ -23,6 +23,10 @@ const de = {
   previewSource: 'Quelle',
   previewOvershoot: (h: number) =>
     `Diese Quelle hat nichts unterhalb von ${h}p — du bekommst ${h}p.`,
+  previewOriginal: 'Original',
+  previewAudioCopy: 'Wird 1:1 übernommen — kein Qualitätsverlust, kein Umkodieren.',
+  previewAudioOvershoot: (n: number) =>
+    `Diese Quelle hat nichts unterhalb von ${n} kbps — du bekommst ${n} kbps.`,
 
   // mode & quality
   video: 'Video',
@@ -30,6 +34,8 @@ const de = {
   quality: 'Qualität',
   qualityBest: 'Beste',
   bitrate: 'Bitrate',
+  bitrateAuto: 'Auto',
+  bitrateAutoHint: 'Beste verfügbare Quelle, ohne Hochrechnen',
   target: 'Zielordner',
   changeFolder: 'Ordner wählen',
   openFolder: 'Ordner öffnen',
@@ -152,12 +158,18 @@ const en: typeof de = {
   previewIdle: 'No preview',
   previewSource: 'Source',
   previewOvershoot: (h: number) => `This source has nothing below ${h}p — you'll get ${h}p.`,
+  previewOriginal: 'Original',
+  previewAudioCopy: 'Copied as-is — nothing re-encoded, nothing lost.',
+  previewAudioOvershoot: (n: number) =>
+    `This source has nothing below ${n} kbps — you'll get ${n} kbps.`,
 
   video: 'Video',
   audio: 'Audio',
   quality: 'Quality',
   qualityBest: 'Best',
   bitrate: 'Bitrate',
+  bitrateAuto: 'Auto',
+  bitrateAutoHint: 'Best the source has, never upscaled',
   target: 'Destination',
   changeFolder: 'Choose folder',
   openFolder: 'Open folder',

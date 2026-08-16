@@ -22,7 +22,9 @@ function defaultSettings(): Settings {
     audioDir: join(music, 'Universal Downloader'),
     imageDir: join(pictures, 'Universal Downloader'),
     videoQuality: 'best',
-    audioBitrate: '192',
+    // Takes whatever the source really has instead of inventing bits ffmpeg
+    // would have to fabricate — see `engine.decide_audio`.
+    audioBitrate: 'auto',
     cookiefile: null,
     concurrency: 3
   }

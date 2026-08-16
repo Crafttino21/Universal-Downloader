@@ -8,11 +8,11 @@ import { PlatformBadge } from '@/components/PlatformBadge'
 import { UrlPreview } from '@/components/UrlPreview'
 import { useApp } from '@/hooks/useApp'
 import { AUDIO_ONLY, detectPlatform, splitUrls } from '@/lib/platform'
+import { audioChoices, effectiveAudio } from '@/lib/quality'
 import { shortPath } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 const VIDEO_QUALITIES: VideoQuality[] = ['best', '2160', '1440', '1080', '720', '480', '360']
-const AUDIO_BITRATES: AudioBitrate[] = ['320', '256', '192', '128']
 
 interface UrlBarProps {
   mode: DownloadMode
@@ -38,6 +38,11 @@ export function UrlBar({ mode, onModeChange, onSubmit, busy }: UrlBarProps): Rea
   const single = urls.length === 1 ? urls[0] : null
   const previewable =
     single != null && (/^https?:\/\//i.test(single) || detectPlatform(single) !== 'other')
+
+  // Without a probe these are the fallback rungs, so a batch paste still works.
+  const bitrate = settings?.audioBitrate ?? 'auto'
+  const bitrates = audioChoices(probe)
+  const outcome = effectiveAudio(probe, bitrate)
 
   // SoundCloud and friends have no video stream at all. Left in video mode the
   // download would fall through to the audio-only format and land an .opus in
@@ -163,7 +168,7 @@ export function UrlBar({ mode, onModeChange, onSubmit, busy }: UrlBarProps): Rea
           probing={probing}
           mode={mode}
           videoQuality={settings?.videoQuality ?? 'best'}
-          audioBitrate={settings?.audioBitrate ?? '192'}
+          audioBitrate={bitrate}
         />
       ) : urls.length === 1 ? (
         <div className="flex min-h-5 items-center gap-2 text-[12px] text-fg-muted">
@@ -193,16 +198,27 @@ export function UrlBar({ mode, onModeChange, onSubmit, busy }: UrlBarProps): Rea
           </Select>
         ) : (
           <Select
-            value={settings?.audioBitrate ?? '192'}
+            value={bitrate}
             onValueChange={(v) => void updateSettings({ audioBitrate: v as AudioBitrate })}
           >
             <SelectTrigger className="w-[104px]" aria-label={t.bitrate}>
-              <SelectValue />
+              {/* The stored ceiling survives a source that can't meet it, so no
+                  item matches and Radix would render an empty trigger. Show what
+                  this link will really produce instead. */}
+              <SelectValue>
+                {bitrate === 'auto'
+                  ? t.bitrateAuto
+                  : `${bitrates.find((c) => c.value === bitrate)?.kbps ?? outcome?.kbps ?? bitrate} kbps`}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              {AUDIO_BITRATES.map((b) => (
-                <SelectItem key={b} value={b} className="tnum">
-                  {b} kbps
+              <SelectItem value="auto" className="tnum" title={t.bitrateAutoHint}>
+                {t.bitrateAuto}
+              </SelectItem>
+              {/* One entry per stream the source actually carries. */}
+              {bitrates.map((c) => (
+                <SelectItem key={c.value} value={c.value} className="tnum">
+                  {c.kbps} kbps
                 </SelectItem>
               ))}
             </SelectContent>

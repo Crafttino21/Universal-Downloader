@@ -19,7 +19,26 @@ export type DownloadMode = 'video' | 'audio'
 
 export type VideoQuality = 'best' | '2160' | '1440' | '1080' | '720' | '480' | '360'
 
-export type AudioBitrate = '320' | '256' | '192' | '128'
+/**
+ * `auto` takes the source's best stream; a number is a *ceiling on the source
+ * stream* in kbps, the audio counterpart of `VideoQuality`'s height cap. The
+ * values come from what the source actually offers, so they aren't a fixed set.
+ */
+export type AudioBitrate = 'auto' | `${number}`
+
+/** One entry of the bitrate menu, already resolved by `engine.audio_options`. */
+export interface AudioOption {
+  /** The ceiling to store in settings — always a rate the source carries. */
+  cap: number
+  /** What this choice puts on disk, kbps. */
+  kbps: number
+  container: 'mp3' | 'm4a'
+  /** True when the stream is copied rather than re-encoded. */
+  copied: boolean
+  /** Raw source values, forwarded into the job so the engine can skip a probe. */
+  abr: number
+  acodec: string
+}
 
 export type JobStatus =
   | 'queued'
@@ -41,6 +60,13 @@ export interface JobSpec {
   audioBitrate: AudioBitrate
   cookiefile: string | null
   playlist: boolean
+  /**
+   * The source's real audio rate/codec, when the URL bar already probed it.
+   * Lets the engine clamp without re-extracting; it fetches them itself when
+   * they're missing (batch pastes, retries).
+   */
+  sourceAbr: number | null
+  sourceAcodec: string | null
 }
 
 /** Metadata returned by the daemon's `probe` command. */
@@ -52,6 +78,8 @@ export interface ProbeResult {
   extractor: string | null
   /** Distinct video heights actually available, descending. */
   heights: number[]
+  /** The selectable audio streams, best first. Empty when the source says nothing. */
+  audioOptions: AudioOption[]
   isPlaylist: boolean
   playlistCount: number | null
 }
@@ -77,6 +105,8 @@ export interface DoneEvent {
   filepath: string
   filesize: number | null
   title: string | null
+  /** What the audio job really produced, e.g. "MP3 · 128 kbps (Original)". */
+  audioSummary?: string | null
 }
 
 export interface FailedEvent {

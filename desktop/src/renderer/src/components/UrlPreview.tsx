@@ -9,7 +9,7 @@ import type {
 import { PlatformBadge } from '@/components/PlatformBadge'
 import { Poster } from '@/components/Poster'
 import { useApp } from '@/hooks/useApp'
-import { effectiveHeight, ladderRungs } from '@/lib/quality'
+import { effectiveAudio, effectiveHeight, ladderRungs } from '@/lib/quality'
 import { cn } from '@/lib/utils'
 
 interface UrlPreviewProps {
@@ -35,16 +35,30 @@ export function UrlPreview({
 
   const heights = probe.heights ?? []
   const effective = mode === 'video' ? effectiveHeight(heights, videoQuality) : null
-  const rungs = mode === 'video' ? ladderRungs(heights, effective) : []
+  const audio = mode === 'audio' ? effectiveAudio(probe, audioBitrate) : null
+
+  // Audio rungs are the source's own streams, so they need no thinning — the
+  // engine already collapsed duplicates into one entry each.
+  const rungs =
+    mode === 'video'
+      ? ladderRungs(heights, effective)
+      : (probe.audioOptions ?? []).map((o) => o.kbps)
 
   // The engine's `best` fallback can overshoot a tight cap — 4K when you asked
   // for 360p is worth saying out loud.
   const overshoot =
     effective != null && videoQuality !== 'best' && effective > Number(videoQuality)
 
+  // The audio counterpart, same fallback and same surprise: no stream fits the
+  // ceiling, so the selector lands on the best one instead of the smallest.
+  const audioOvershoot =
+    audio != null && audioBitrate !== 'auto' && audio.cap > Number(audioBitrate)
+
   const result =
     mode === 'audio'
-      ? `MP3 · ${audioBitrate} kbps`
+      ? audio != null
+        ? `${audio.container.toUpperCase()} · ${audio.kbps} kbps`
+        : `MP3 · ${audioBitrate === 'auto' ? t.bitrateAuto : `${audioBitrate} kbps`}`
       : `MP4 · ${
           effective != null
             ? `${effective}p`
@@ -97,7 +111,7 @@ export function UrlPreview({
 
       {/* Source → result. Left is what the site has, right is what lands on disk. */}
       <div className="flex items-center gap-2.5 border-t border-border bg-surface-2/40 px-2.5 py-1.5">
-        {/* Audio mode and audio-only sources have no ladder — the label is
+        {/* A source that reports no formats at all has no ladder — the label is
             dropped with it rather than left dangling over nothing. */}
         {rungs.length > 0 && (
           <>
@@ -108,7 +122,7 @@ export function UrlPreview({
                   key={h}
                   className={cn(
                     'tnum rounded-[4px] px-1.5 py-px text-[10px] leading-[1.6]',
-                    h === effective
+                    h === (effective ?? audio?.kbps)
                       ? 'bg-accent-soft font-medium text-accent'
                       : 'text-fg-muted/70'
                   )}
@@ -122,11 +136,26 @@ export function UrlPreview({
 
         {/* The conclusion of the row, so it carries full contrast. */}
         <span
-          className={cn('tnum ml-auto shrink-0 text-[11px]', overshoot ? 'text-warn' : 'text-fg')}
-          title={overshoot ? t.previewOvershoot(effective!) : undefined}
+          className={cn(
+            'tnum ml-auto shrink-0 text-[11px]',
+            overshoot || audioOvershoot ? 'text-warn' : 'text-fg'
+          )}
+          title={
+            overshoot
+              ? t.previewOvershoot(effective!)
+              : audioOvershoot
+                ? t.previewAudioOvershoot(audio!.kbps)
+                : audio?.copied
+                  ? t.previewAudioCopy
+                  : undefined
+          }
         >
           <span className="mr-1.5 text-fg-muted/60">→</span>
           {result}
+          {/* Copied, not re-encoded — the one case where you lose nothing. */}
+          {audio?.copied && (
+            <span className="ml-1.5 text-[10px] text-fg-muted/70">{t.previewOriginal}</span>
+          )}
         </span>
       </div>
     </article>

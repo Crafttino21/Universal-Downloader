@@ -201,6 +201,7 @@ class Daemon:
                 filepath=result["filepath"],
                 filesize=result["filesize"],
                 title=result["title"],
+                audioSummary=result.get("audioSummary"),
             )
         except DownloadCancelled:
             self._event("status", jobId=job_id, status="cancelled", detail=None)
